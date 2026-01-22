@@ -9,8 +9,8 @@ import (
 // rewritesAPIPath is the HTTP path for the rewrites API.
 const rewritesAPIPath = "rewrites"
 
-// Rewrites represents the rewrite list of a profile.
-type Rewrites struct {
+// Rewrite represents the rewrite list of a profile.
+type Rewrite struct {
 	ID      string `json:"id,omitempty"`
 	Name    string `json:"name"`
 	Type    string `json:"type,omitempty"`
@@ -20,7 +20,7 @@ type Rewrites struct {
 // CreateRewritesRequest encapsulates the request for creating a new rewrite.
 type CreateRewritesRequest struct {
 	ProfileID string
-	Rewrites  *Rewrites
+	Rewrite   *Rewrite
 }
 
 // ListRewritesRequest encapsulates the request for getting an rewrites.
@@ -37,21 +37,21 @@ type DeleteRewritesRequest struct {
 // RewritesService is an interface for communicating with the NextDNS rewrites API endpoint.
 type RewritesService interface {
 	Create(context.Context, *CreateRewritesRequest) (string, error)
-	List(context.Context, *ListRewritesRequest) ([]*Rewrites, error)
+	List(context.Context, *ListRewritesRequest) ([]*Rewrite, error)
 	Delete(context.Context, *DeleteRewritesRequest) error
 }
 
-// rewritesResponse represents the rewrites response.
+// rewritesResponse represents the rewrites's response.
 type rewritesResponse struct {
-	Rewrites []*Rewrites `json:"data"`
+	Rewrites []*Rewrite `json:"data"`
 }
 
 // createRewritesResponse represents the response when creating a rewrite from the NextDNS API.
 type createRewritesResponse struct {
-	Rewrites *Rewrites `json:"data"`
+	Rewrites *Rewrite `json:"data"`
 }
 
-// privacyService represents the NextDNS rewrites service.
+// rewritesService represents the NextDNS rewrites service.
 type rewritesService struct {
 	client *Client
 }
@@ -60,7 +60,7 @@ var _ RewritesService = &rewritesService{}
 
 // NewRewritesService returns a new NextDNS rewrites service.
 // nolint: revive
-func NewRewritesService(client *Client) *rewritesService {
+func NewRewritesService(client *Client) RewritesService {
 	return &rewritesService{
 		client: client,
 	}
@@ -70,7 +70,7 @@ func NewRewritesService(client *Client) *rewritesService {
 func (s *rewritesService) Create(ctx context.Context, request *CreateRewritesRequest) (string, error) {
 	path := fmt.Sprintf("%s/%s", profileAPIPath(request.ProfileID), rewritesAPIPath)
 
-	req, err := s.client.newRequest(http.MethodPost, path, request.Rewrites)
+	req, err := s.client.newRequest(http.MethodPost, path, request.Rewrite)
 	if err != nil {
 		return "", fmt.Errorf("error creating request to create a rewrite: %w", err)
 	}
@@ -85,7 +85,7 @@ func (s *rewritesService) Create(ctx context.Context, request *CreateRewritesReq
 }
 
 // List returns the rewrites of a profile.
-func (s *rewritesService) List(ctx context.Context, request *ListRewritesRequest) ([]*Rewrites, error) {
+func (s *rewritesService) List(ctx context.Context, request *ListRewritesRequest) ([]*Rewrite, error) {
 	path := fmt.Sprintf("%s/%s", profileAPIPath(request.ProfileID), rewritesAPIPath)
 	req, err := s.client.newRequest(http.MethodGet, path, nil)
 	if err != nil {

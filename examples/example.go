@@ -1,52 +1,25 @@
-# nextdns-go
-
-Go client library for [NextDNS](https://nextdns.io/) API.
-
-## Install
-
-```bash
-go get github.com/andrewmzhang/nextdns-go/nextdns
-```
-
-## Requirements
-
-An API Key is required to interact with the NextDNS API.
-You can find your API Key in the [NextDNS account](https://my.nextdns.io/account) page.
-
-## API
-
-The [official API documentation](https://nextdns.github.io/api/) was the base document for this package.
-
-APIs supported by this package:
-
-- [x] Profile (`/profiles` and `/profiles/:profile`)
-- [ ] Analytics (`/profiles/:profile/analytics`)
-- [ ] Logs (`/profiles/:profile/logs`)
-
-## Usage
-
-Here is an example usage of the NextAPI Go client for the `/profiles` endpoint:
-
-```go
 package main
 
 import (
 	"context"
 	"fmt"
-	"os"
-
 	"github.com/amalucelli/nextdns-go/nextdns"
+	"os"
 )
 
 func main() {
 	// get the api key from the environment
 	key := os.Getenv("NEXTDNS_API_KEY")
+	fmt.Println("API key is", key)
 
-	// client client with a custom API key
+	// client with a custom API key
 	ctx := context.Background()
-	client, _ := nextdns.New(
+	client, err := nextdns.New(
 		nextdns.WithAPIKey(key),
 	)
+	if err != nil {
+		panic(err)
+	}
 
 	// set a few settings like the name and some other attributes
 	create := &nextdns.CreateProfileRequest{
@@ -129,51 +102,3 @@ func main() {
 		ProfileID: id,
 	})
 }
-```
-
-It's also possible to update directly the API child endpoints, like the `/profiles/:profile/denylist` endpoint:
-
-```go
-package main
-
-import (
-	"context"
-	"fmt"
-	"os"
-
-	"github.com/amalucelli/nextdns-go/nextdns"
-)
-
-func main() {
-	// get the api key from the environment
-	key := os.Getenv("NEXTDNS_API_KEY")
-
-	// client client with a custom API key
-	ctx := context.Background()
-	client, _ := nextdns.New(
-		nextdns.WithAPIKey(key),
-	)
-
-	// set the profile id
-	id := "abc123"
-
-	// set the request to update the denylist
-	request := &nextdns.UpdateDenylistRequest{
-		ProfileID: id,
-		ID:      "google.com",
-		Denylist: &nextdns.Denylist{
-			Active: true,
-		},
-	}
-
-	// update the denylist
-	_ = client.Denylist.Update(ctx, request)
-
-	// list all the denylist entries
-	list, _ := client.Denylist.Get(ctx, &nextdns.GetDenylistRequest{ProfileID: id})
-	for _, p := range list {
-		fmt.Printf("ID: %q\n", p.ID)
-		fmt.Printf("Status: %t\n", p.Active)
-	}
-}
-```

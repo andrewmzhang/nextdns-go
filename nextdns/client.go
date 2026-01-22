@@ -172,7 +172,7 @@ func New(opts ...ClientOption) (*Client, error) {
 	return c, nil
 }
 
-// do executes an HTTP request and decodes the response into v.
+// do will perform an HTTP request and decode the response into v.
 func (c *Client) do(ctx context.Context, req *http.Request, v interface{}) error {
 	req = req.WithContext(ctx)
 
@@ -207,7 +207,7 @@ func (c *Client) handleResponse(ctx context.Context, res *http.Response, v inter
 		return nil
 	}
 
-	// Sets some default additional informations that can be used by the client to debug the error.
+	// Sets some default additional information that can be used by the client to debug the error.
 	meta := map[string]string{
 		"body":        string(out),
 		"http_status": http.StatusText(res.StatusCode),
