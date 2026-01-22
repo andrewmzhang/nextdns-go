@@ -33,3 +33,5 @@ jobs:
 
       - name: Run Govulncheck
         uses: golang/govulncheck-action@v1
+        with:
+          work-dir: './nextdns'
