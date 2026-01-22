@@ -11,5 +11,3 @@ formatters:
     - gofmt
     - goimports
     - swaggo
-
-gz
