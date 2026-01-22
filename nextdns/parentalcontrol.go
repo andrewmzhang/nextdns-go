@@ -80,7 +80,10 @@ func NewParentalControlService(client *Client) *parentalControlService {
 }
 
 // Get returns the parental control settings of a profile.
-func (s *parentalControlService) Get(ctx context.Context, request *GetParentalControlRequest) (*ParentalControl, error) {
+func (s *parentalControlService) Get(
+	ctx context.Context,
+	request *GetParentalControlRequest,
+) (*ParentalControl, error) {
 	path := fmt.Sprintf("%s/%s", profileAPIPath(request.ProfileID), parentalControlAPIPath)
 	req, err := s.client.newRequest(http.MethodGet, path, nil)
 	if err != nil {
@@ -97,7 +100,10 @@ func (s *parentalControlService) Get(ctx context.Context, request *GetParentalCo
 }
 
 // Update updates the parental control settings of a profile.
-func (s *parentalControlService) Update(ctx context.Context, request *UpdateParentalControlRequest) error {
+func (s *parentalControlService) Update(
+	ctx context.Context,
+	request *UpdateParentalControlRequest,
+) error {
 	path := fmt.Sprintf("%s/%s", profileAPIPath(request.ProfileID), parentalControlAPIPath)
 	req, err := s.client.newRequest(http.MethodPatch, path, request.ParentalControl)
 	if err != nil {

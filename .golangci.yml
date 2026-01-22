@@ -1,36 +1,15 @@
 version: "2"
 
 linters:
-  enable:
-  - depguard
-  - errname
-  - errorlint
-  - errcheck
-  - errorlint
-  - unused
-  - godot
-  - gosec
-  - misspell
-  - revive
-  - thelper
-  - unconvert
-  - unconvert
-  - whitespace
-  - staticcheck
-
-  exclusions:
-    paths:
-      - '(.+)_test\.go'
-
-linters-settings:
-  depguard:
-    list-type: 'denylist'
-    packages-with-error-message:
-      - 'github.com/pkg/errors': 'the github.com/pkg/errors is deprecated, use stdlib instead'
+  default: standard
 
 formatters:
   # Enable specific formatter.
   # Default: [] (uses standard Go formatting)
   enable:
+    - gci
     - gofmt
-    - gofumpt
+    - goimports
+    - swaggo
+
+gz

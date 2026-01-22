@@ -57,7 +57,10 @@ func NewPrivacyBlocklistsService(client *Client) *privacyBlocklistsService {
 }
 
 // Create creates a privacy blocklist list for a profile.
-func (s *privacyBlocklistsService) Create(ctx context.Context, request *CreatePrivacyBlocklistsRequest) error {
+func (s *privacyBlocklistsService) Create(
+	ctx context.Context,
+	request *CreatePrivacyBlocklistsRequest,
+) error {
 	path := fmt.Sprintf("%s/%s", profileAPIPath(request.ProfileID), privacyBlocklistsAPIPath)
 	req, err := s.client.newRequest(http.MethodPut, path, request.PrivacyBlocklists)
 	if err != nil {
@@ -74,7 +77,10 @@ func (s *privacyBlocklistsService) Create(ctx context.Context, request *CreatePr
 }
 
 // List returns the privacy blocklist for a profile.
-func (s *privacyBlocklistsService) List(ctx context.Context, request *ListPrivacyBlocklistsRequest) ([]*PrivacyBlocklists, error) {
+func (s *privacyBlocklistsService) List(
+	ctx context.Context,
+	request *ListPrivacyBlocklistsRequest,
+) ([]*PrivacyBlocklists, error) {
 	path := fmt.Sprintf("%s/%s", profileAPIPath(request.ProfileID), privacyBlocklistsAPIPath)
 	req, err := s.client.newRequest(http.MethodGet, path, nil)
 	if err != nil {

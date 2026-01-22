@@ -180,7 +180,9 @@ func (c *Client) do(ctx context.Context, req *http.Request, v interface{}) error
 	if err != nil {
 		return err
 	}
-	defer res.Body.Close()
+	defer func() {
+		_ = res.Body.Close()
+	}()
 
 	return c.handleResponse(ctx, res, v)
 }

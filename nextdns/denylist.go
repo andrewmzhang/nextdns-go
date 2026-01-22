@@ -77,7 +77,10 @@ func (s *denylistService) Create(ctx context.Context, request *CreateDenylistReq
 }
 
 // List returns the denylist of a profile.
-func (s *denylistService) List(ctx context.Context, request *ListDenylistRequest) ([]*Denylist, error) {
+func (s *denylistService) List(
+	ctx context.Context,
+	request *ListDenylistRequest,
+) ([]*Denylist, error) {
 	path := fmt.Sprintf("%s/%s", profileAPIPath(request.ProfileID), denylistAPIPath)
 	req, err := s.client.newRequest(http.MethodGet, path, nil)
 	if err != nil {
@@ -98,12 +101,20 @@ func (s *denylistService) Update(ctx context.Context, request *UpdateDenylistReq
 	path := fmt.Sprintf("%s/%s", profileAPIPath(request.ProfileID), denylistIDAPIPath(request.ID))
 	req, err := s.client.newRequest(http.MethodPatch, path, request.Denylist)
 	if err != nil {
-		return fmt.Errorf("error creating request to update the deny list id %s: %w", request.ID, err)
+		return fmt.Errorf(
+			"error creating request to update the deny list id %s: %w",
+			request.ID,
+			err,
+		)
 	}
 
 	err = s.client.do(ctx, req, nil)
 	if err != nil {
-		return fmt.Errorf("error making a request to update the deny list id %s: %w", request.ID, err)
+		return fmt.Errorf(
+			"error making a request to update the deny list id %s: %w",
+			request.ID,
+			err,
+		)
 	}
 
 	return nil

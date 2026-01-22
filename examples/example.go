@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/amalucelli/nextdns-go/nextdns"
 	"os"
+
+	"github.com/andrewmzhang/nextdns-go/nextdns"
 )
 
 func main() {

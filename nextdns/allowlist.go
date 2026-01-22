@@ -77,7 +77,10 @@ func (s *allowlistService) Create(ctx context.Context, request *CreateAllowlistR
 }
 
 // List returns the allowlist of a profile.
-func (s *allowlistService) List(ctx context.Context, request *ListAllowlistRequest) ([]*Allowlist, error) {
+func (s *allowlistService) List(
+	ctx context.Context,
+	request *ListAllowlistRequest,
+) ([]*Allowlist, error) {
 	path := fmt.Sprintf("%s/%s", profileAPIPath(request.ProfileID), allowlistAPIPath)
 	req, err := s.client.newRequest(http.MethodGet, path, nil)
 	if err != nil {
@@ -98,12 +101,20 @@ func (s *allowlistService) Update(ctx context.Context, request *UpdateAllowlistR
 	path := fmt.Sprintf("%s/%s", profileAPIPath(request.ProfileID), allowlistIDAPIPath(request.ID))
 	req, err := s.client.newRequest(http.MethodPatch, path, request.Allowlist)
 	if err != nil {
-		return fmt.Errorf("error creating request to update the allow list id %s: %w", request.ID, err)
+		return fmt.Errorf(
+			"error creating request to update the allow list id %s: %w",
+			request.ID,
+			err,
+		)
 	}
 
 	err = s.client.do(ctx, req, nil)
 	if err != nil {
-		return fmt.Errorf("error making a request to update the allow list id %s: %w", request.ID, err)
+		return fmt.Errorf(
+			"error making a request to update the allow list id %s: %w",
+			request.ID,
+			err,
+		)
 	}
 
 	return nil
