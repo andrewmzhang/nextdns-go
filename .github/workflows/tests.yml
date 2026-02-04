@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    name: Run Go Tests on ./nextdns
+    name: Run Go Tests on ./nextdns-go
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -25,4 +25,4 @@ jobs:
         run: go mod tidy
 
       - name: Run tests
-        run: go test ./nextdns -v
+        run: go test ./nextdns-go -v
