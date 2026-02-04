@@ -19,9 +19,12 @@ var (
 
 // TestMain runs once for the entire package
 func TestMain(m *testing.M) {
-	err := godotenv.Load("../.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	// Load .env if it exists; ignore error if file is missing
+	if err := godotenv.Load("../.env"); err != nil {
+		if !os.IsNotExist(err) {
+			// Only log errors other than file-not-found
+			log.Println("Warning: error loading .env:", err)
+		}
 	}
 	nextdnsApiToken = os.Getenv("NEXTDNS_API_TOKEN")
 	if nextdnsApiToken == "" {
