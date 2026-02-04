@@ -32,7 +32,7 @@ func TestMain(m *testing.M) {
 		os.Exit(0)
 	}
 
-	client, err = services.NewClient(services.WithAPIKey(nextdnsApiToken))
+	client, err := services.NewClient(services.WithAPIKey(nextdnsApiToken))
 	if err != nil {
 		panic(err)
 	}
