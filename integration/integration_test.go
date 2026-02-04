@@ -31,8 +31,8 @@ func TestMain(m *testing.M) {
 		fmt.Println("Skipping integration tests: API_BASE_URL or API_AUTH_TOKEN not set")
 		os.Exit(0)
 	}
-
-	client, err := services.NewClient(services.WithAPIKey(nextdnsApiToken))
+	var err error
+	client, err = services.NewClient(services.WithAPIKey(nextdnsApiToken))
 	if err != nil {
 		panic(err)
 	}
