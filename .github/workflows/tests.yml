@@ -16,6 +16,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Load secret
+        id: load_secrets
+        uses: 1password/load-secrets-action@v3
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          SECRET: "op://Service/waw6ozs2rl3wckef47kk2ieazi/credential"
+      #          OP_ENV_FILE: "./path/to/.env.tpl" # see tests/.env.tpl for example
+
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
@@ -25,4 +33,6 @@ jobs:
         run: go mod tidy
 
       - name: Run tests
-        run: go test ./nextdns-go -v
+        run: |
+          cd ./integration
+          NEXTDNS_API_TOKEN=${{ steps.load_secrets.outputs.SECRET }} go test -tags integration
