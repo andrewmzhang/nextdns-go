@@ -13,18 +13,27 @@ jobs:
     name: Integration tests
     runs-on: ubuntu-latest
     steps:
+      # Validate required secrets
+      - name: Check Required Secrets
+        run: |
+          if [ -z "${{ secrets.NEXTDNS_API_TOKEN }}" ] || { [ -z "${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}" ] && [ -z "${{ secrets.OP_NEXTDNS_API_TOKEN_REF }}" ]; }; then
+            echo "ERROR: You must provide either NEXTDNS_API_TOKEN, or both OP_SERVICE_ACCOUNT_TOKEN and OP_NEXTDNS_API_TOKEN_REF."
+            exit 1
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      # Use secrets.NEXTDNS_API_TOKEN if present
-      - name: Set NextDNS API Token from GitHub Secrets
-        if: ${{ secrets.NEXTDNS_API_TOKEN != '' }}
+      # Export GitHub Secret if it exists
+      - name: Set NEXTDNS_API_TOKEN from GitHub Secret
         run: |
-          echo "NEXTDNS_API_TOKEN=${{ secrets.NEXTDNS_API_TOKEN }}" >> "$GITHUB_ENV"
+          if [ -n "${{ secrets.NEXTDNS_API_TOKEN }}" ]; then
+            echo "NEXTDNS_API_TOKEN=${{ secrets.NEXTDNS_API_TOKEN }}" >> "$GITHUB_ENV"
+          fi
 
       # Otherwise attempt to load via 1Password
       - name: Load NextDNS API Token
-        if: ${{ secrets.NEXTDNS_API_TOKEN == '' }}
+        if: env.NEXTDNS_API_TOKEN == ''
         uses: 1password/load-secrets-action@v3
         with:
           export-env: true
