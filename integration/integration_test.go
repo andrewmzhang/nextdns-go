@@ -3,11 +3,13 @@
 package integration
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
 	"testing"
 
+	"github.com/andrewmzhang/nextdns-go"
 	"github.com/andrewmzhang/nextdns-go/services"
 	"github.com/joho/godotenv"
 )
@@ -32,19 +34,19 @@ func TestMain(m *testing.M) {
 		os.Exit(1)
 	}
 	var err error
-	client, err = services.NewClient(services.WithAPIKey(nextdnsApiToken))
+	client, err = nextdns.NewClient(services.WithAPIKey(nextdnsApiToken))
 	if err != nil {
 		panic(err)
 	}
 	// Check that there are no lingering integration test profiles
-	// profiles, err := client.Profiles().List(context.Background())
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// for _, profileSummary := range profiles {
-	// 	if isCreatedByIntegrationTest(profileSummary) {
-	// 		panic("Not expecting profile " + profileSummary.Name)
-	// 	}
-	// }
+	profiles, err := client.Profiles().List(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	for _, profileSummary := range profiles {
+		if isCreatedByIntegrationTest(profileSummary) {
+			panic("Not expecting profile " + profileSummary.Name)
+		}
+	}
 	os.Exit(m.Run())
 }

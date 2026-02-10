@@ -114,7 +114,7 @@ func (it *AnalyticIterator[Service, Config, T]) Next() bool {
 	}
 
 	// Cursor is not nil, we need to fetch next page
-	resp, err := fetchPage[T, Config](it.ctx, it.nextDNSClient.client, it.path, it.isTimeSeries, it.config, it.cursor)
+	resp, err := fetchPage[T, Config](it.ctx, it.nextDNSClient.restyClient, it.path, it.isTimeSeries, it.config, it.cursor)
 	if err != nil {
 		it.err = err
 		fmt.Println("Error fetching next DNS page")

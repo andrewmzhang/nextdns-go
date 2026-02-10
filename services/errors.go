@@ -1,4 +1,4 @@
-package nextdns
+package services
 
 import (
 	"errors"

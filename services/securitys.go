@@ -1,6 +1,8 @@
 package services
 
-import "github.com/andrewmzhang/nextdns-go/models"
+import (
+	"github.com/andrewmzhang/nextdns-go/models"
+)
 
 type BoundSecurity struct {
 	boundPath     string
