@@ -9,6 +9,7 @@ type BoundRewrite struct {
 	nextDNSClient *NextDNSClient
 	// GetableResource[models.Rewrite]
 	// UpdatableResource[models.Rewrite]
+	ListGetableResource[models.Rewrite]
 	DeletableResource[models.Rewrite]
 }
 
@@ -20,6 +21,8 @@ func (b *BoundRewrite) SetBind(nextDNSClient *NextDNSClient, bindPath string) *B
 	// b.GetableResource.nextDNSClient = nextDNSClient
 	// b.UpdatableResource.boundPath = bindPath
 	// b.UpdatableResource.nextDNSClient = nextDNSClient
+	b.ListGetableResource.nextDNSClient = nextDNSClient
+	b.ListGetableResource.boundPath = bindPath
 	b.DeletableResource.boundPath = bindPath
 	b.DeletableResource.nextDNSClient = nextDNSClient
 	return b

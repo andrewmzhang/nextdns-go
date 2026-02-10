@@ -196,13 +196,15 @@ func (r *ListGetableResource[T]) Get(ctx context.Context) (*T, error) {
 	}
 	err = handleResponse(resp, &results)
 
-	hexStr := filepath.Base(r.boundPath)
-	hexStr = strings.TrimPrefix(hexStr, "hex:")
-	bytes, err := hex.DecodeString(hexStr)
-	if err != nil {
-		return nil, err
+	decodedId := filepath.Base(r.boundPath)
+	if strings.HasPrefix(decodedId, "hex:") {
+		decodedId = strings.TrimPrefix(decodedId, "hex:")
+		bytes, err := hex.DecodeString(decodedId)
+		if err != nil {
+			return nil, err
+		}
+		decodedId = string(bytes)
 	}
-	decodedId := string(bytes)
 
 	for _, obj := range results.Data {
 		// Marshal object to JSON

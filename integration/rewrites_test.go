@@ -36,6 +36,11 @@ func TestRewriteLifecycle(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, rewrite.ID)
 
+	// List-get test
+	rewrite, err = client.Rewrites(create.ID).Bind(rewrite.ID).Get(ctx)
+	require.NoError(t, err)
+	require.NotEmpty(t, rewrite.ID)
+
 	// Delete
 	err = client.Rewrites(create.ID).Bind(rewrite.ID).Delete(ctx)
 	require.NoError(t, err)
