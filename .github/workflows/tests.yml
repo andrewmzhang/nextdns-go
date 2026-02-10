@@ -9,20 +9,28 @@ on:
       - main
 
 jobs:
-  test:
-    name: Run Go Tests on ./nextdns-go
+  integration:
+    name: Integration tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Load secret
-        id: load_secrets
+      # Use secrets.NEXTDNS_API_TOKEN if present
+      - name: Set NextDNS API Token from GitHub Secrets
+        if: ${{ secrets.NEXTDNS_API_TOKEN != '' }}
+        run: |
+          echo "NEXTDNS_API_TOKEN=${{ secrets.NEXTDNS_API_TOKEN }}" >> "$GITHUB_ENV"
+
+      # Otherwise attempt to load via 1Password
+      - name: Load NextDNS API Token
+        if: ${{ secrets.NEXTDNS_API_TOKEN == '' }}
         uses: 1password/load-secrets-action@v3
+        with:
+          export-env: true
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          SECRET: "op://Service/waw6ozs2rl3wckef47kk2ieazi/credential"
-      #          OP_ENV_FILE: "./path/to/.env.tpl" # see tests/.env.tpl for example
+          NEXTDNS_API_TOKEN: ${{ secrets.OP_NEXTDNS_API_TOKEN_REF }}
 
       - name: Set up Go
         uses: actions/setup-go@v6
@@ -33,6 +41,6 @@ jobs:
         run: go mod tidy
 
       - name: Run tests
+        if: env.NEXTDNS_API_TOKEN != ''
         run: |
-          cd ./integration
-          NEXTDNS_API_TOKEN=${{ steps.load_secrets.outputs.SECRET }} go test -tags integration
+          NEXTDNS_API_TOKEN=$NEXTDNS_API_TOKEN go test -tags integration
