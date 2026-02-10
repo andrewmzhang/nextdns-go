@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/andrewmzhang/nextdns-go/services"
+	"github.com/andrewmzhang/nextdns-go"
 )
 
 func capitalize(s string) string {
@@ -30,7 +30,7 @@ func dashToPascal(s string) string {
 func main() {
 
 	ctx := context.Background()
-	client, err := services.NewClient()
+	client, err := nextdns.NewClient()
 	if err != nil {
 		log.Fatalf("Failed to create nextdns client: %v", err)
 	}

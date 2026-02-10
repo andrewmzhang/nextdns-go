@@ -49,7 +49,7 @@ func (r *Resource[T]) List(
 	results := &struct {
 		Data []T `json:"data"`
 	}{}
-	resp, err := r.nextDNSClient.client.R().SetContext(ctx).SetResult(&results).Get(r.path)
+	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).SetResult(&results).Get(r.path)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (r *Resource[T]) Create(ctx context.Context, payload T) (*T, error) {
 	result := &struct {
 		Data T `json:"data"`
 	}{}
-	resp, err := r.nextDNSClient.client.R().SetContext(ctx).SetBody(payload).SetResult(&result).Post(r.path)
+	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).SetBody(payload).SetResult(&result).Post(r.path)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (r *ListableResource[T]) List(
 	results := &struct {
 		Data []T `json:"data"`
 	}{}
-	resp, err := r.nextDNSClient.client.R().SetContext(ctx).SetResult(&results).Get(r.path)
+	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).SetResult(&results).Get(r.path)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (r *CreatableResource[T]) Create(ctx context.Context, payload T) (*T, error
 	result := &struct {
 		Data T `json:"data"`
 	}{}
-	resp, err := r.nextDNSClient.client.R().SetContext(ctx).SetBody(payload).SetResult(&result).Post(r.path)
+	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).SetBody(payload).SetResult(&result).Post(r.path)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ type GetableResource[T any] struct {
 func (r *GetableResource[T]) Get(ctx context.Context) (*T, error) {
 
 	var result DataWrapper[T]
-	resp, err := r.nextDNSClient.client.R().SetContext(ctx).
+	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).
 		SetResult(&result).
 		Get(r.boundPath)
 	if err != nil {
@@ -187,7 +187,7 @@ func (r *ListGetableResource[T]) Get(ctx context.Context) (*T, error) {
 		Data []T `json:"data"`
 	}{}
 	parent := filepath.Dir(r.boundPath)
-	resp, err := r.nextDNSClient.client.R().SetContext(ctx).
+	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).
 		SetResult(&results).
 		Get(parent)
 
@@ -232,7 +232,7 @@ type UpdatableResource[T any] struct {
 
 func (r *UpdatableResource[T]) Update(ctx context.Context, payload any) error {
 	var result DataWrapper[T]
-	resp, err := r.nextDNSClient.client.R().SetContext(ctx).
+	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).
 		SetBody(payload).
 		Patch(r.boundPath)
 
@@ -247,7 +247,7 @@ type DeletableResource[T any] struct {
 
 func (r *DeletableResource[T]) Delete(ctx context.Context) error {
 	var result DataWrapper[T]
-	resp, err := r.nextDNSClient.client.R().SetContext(ctx).
+	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).
 		Delete(r.boundPath)
 	if err != nil {
 		return err
