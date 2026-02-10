@@ -5,7 +5,7 @@ Go client library for [NextDNS](https://nextdns.io/) API.
 ## Install
 
 ```bash
-go get github.com/amalucelli/nextdns-go/nextdns
+go get github.com/andrewmzhang/nextdns-go/nextdns-go
 ```
 
 ## Requirements

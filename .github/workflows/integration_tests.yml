@@ -1,0 +1,56 @@
+name: Run Go Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  integration:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    steps:
+      # Validate required secrets
+      - name: Check Required Secrets
+        run: |
+          # If missing nextdns token AND missing OP_SERVICE_ACCOUNT_TOKEN or OP_NEXTDNS_API_TOKEN_REF, fail the test early
+          if [ -z "${{ secrets.NEXTDNS_API_TOKEN }}" ] && { [ -z "${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}" ] || [ -z "${{ secrets.OP_NEXTDNS_API_TOKEN_REF }}" ]; }; then
+            echo "ERROR: You must provide either NEXTDNS_API_TOKEN, or both OP_SERVICE_ACCOUNT_TOKEN and OP_NEXTDNS_API_TOKEN_REF."
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      # Export GitHub Secret if it exists
+      - name: Set NEXTDNS_API_TOKEN from GitHub Secret
+        run: |
+          if [ -n "${{ secrets.NEXTDNS_API_TOKEN }}" ]; then
+            echo "NEXTDNS_API_TOKEN=${{ secrets.NEXTDNS_API_TOKEN }}" >> "$GITHUB_ENV"
+          fi
+
+      # Otherwise attempt to load via 1Password
+      - name: Load NextDNS API Token
+        if: env.NEXTDNS_API_TOKEN == ''
+        uses: 1password/load-secrets-action@v3
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          NEXTDNS_API_TOKEN: ${{ secrets.OP_NEXTDNS_API_TOKEN_REF }}
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '^1.24.12'
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Run tests
+        if: env.NEXTDNS_API_TOKEN != ''
+        run: |
+          NEXTDNS_API_TOKEN=$NEXTDNS_API_TOKEN go test -tags integration
