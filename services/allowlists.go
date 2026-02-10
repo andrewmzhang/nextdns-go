@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"strings"
 
-	"github.com/andrewmzhang/nextdns/models"
+	"github.com/andrewmzhang/nextdns-go/models"
 )
 
 type BoundAllowlist struct {

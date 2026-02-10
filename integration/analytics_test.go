@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/andrewmzhang/nextdns/models"
-	"github.com/andrewmzhang/nextdns/services"
+	"github.com/andrewmzhang/nextdns-go/models"
+	"github.com/andrewmzhang/nextdns-go/services"
 	"github.com/stretchr/testify/require"
 )
 

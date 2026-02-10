@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/andrewmzhang/nextdns/services"
+	"github.com/andrewmzhang/nextdns-go/services"
 	"github.com/joho/godotenv"
 )
 
