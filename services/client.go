@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/andrewmzhang/nextdns"
-	"github.com/andrewmzhang/nextdns/models"
+	"github.com/andrewmzhang/nextdns-go"
+	"github.com/andrewmzhang/nextdns-go/models"
 	"resty.dev/v3"
 )
 

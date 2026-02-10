@@ -1,7 +1,7 @@
 package nextdns
 
 import (
-	"github.com/andrewmzhang/nextdns/models"
+	"github.com/andrewmzhang/nextdns-go/models"
 )
 
 // profilesService is the HTTP path for the profiles API.

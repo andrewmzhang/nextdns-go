@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"iter"
 
-	"github.com/andrewmzhang/nextdns/models"
+	"github.com/andrewmzhang/nextdns-go/models"
 	"resty.dev/v3"
 )
 

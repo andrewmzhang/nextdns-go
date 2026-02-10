@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/andrewmzhang/nextdns/services"
+	"github.com/andrewmzhang/nextdns-go/services"
 )
 
 func capitalize(s string) string {

@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andrewmzhang/nextdns/models"
+	"github.com/andrewmzhang/nextdns-go/models"
 	"github.com/stretchr/testify/require"
 )
 
