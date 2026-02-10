@@ -24,7 +24,7 @@ type AnalyticsBaseQueryConfig struct {
 	Partials  string `json:"partials,omitempty"`
 }
 
-type AnalyticService[T any, C any] struct {
+type TimeSeriesService[T any, C any] struct {
 	path          string
 	nextDNSClient *NextDNSClient
 }
@@ -85,8 +85,8 @@ type AnalyticIterator[Service any, Config any, T any] struct {
 	index  int
 }
 
-func (s *AnalyticService[T, C]) Query(ctx context.Context, config C, isTimeSeries bool) *AnalyticIterator[AnalyticService[T, C], C, T] {
-	return &AnalyticIterator[AnalyticService[T, C], C, T]{
+func (s *TimeSeriesService[T, C]) Query(ctx context.Context, config C, isTimeSeries bool) *AnalyticIterator[TimeSeriesService[T, C], C, T] {
+	return &AnalyticIterator[TimeSeriesService[T, C], C, T]{
 		nextDNSClient: s.nextDNSClient,
 		path:          s.path,
 		isTimeSeries:  isTimeSeries,
@@ -148,7 +148,7 @@ func (it *AnalyticIterator[Service, Config, T]) Err() error {
 	return it.err
 }
 
-func (c *AnalyticService[T, C]) ListAll(ctx context.Context, config C, isTimeSeries bool) ([]T, error) {
+func (c *TimeSeriesService[T, C]) ListAll(ctx context.Context, config C, isTimeSeries bool) ([]T, error) {
 	it := c.Query(ctx, config, isTimeSeries)
 
 	var out []T
@@ -163,7 +163,7 @@ func (c *AnalyticService[T, C]) ListAll(ctx context.Context, config C, isTimeSer
 	return out, nil
 }
 
-func (c *AnalyticService[T, C]) AnalyticsRange(ctx context.Context, config C, isTimeSeries bool) iter.Seq[T] {
+func (c *TimeSeriesService[T, C]) AnalyticsRange(ctx context.Context, config C, isTimeSeries bool) iter.Seq[T] {
 	return func(yield func(status T) bool) {
 		it := c.Query(ctx, config, isTimeSeries)
 
@@ -181,8 +181,8 @@ type AnalyticsStatusQueryConfig struct {
 	AnalyticsBaseQueryConfig
 }
 
-func (c *NextDNSClient) AnalyticStatus(profileId string) *AnalyticService[models.AnalyticStatus, AnalyticsStatusQueryConfig] {
-	return &AnalyticService[models.AnalyticStatus, AnalyticsStatusQueryConfig]{
+func (c *NextDNSClient) AnalyticStatus(profileId string) *TimeSeriesService[models.AnalyticStatus, AnalyticsStatusQueryConfig] {
+	return &TimeSeriesService[models.AnalyticStatus, AnalyticsStatusQueryConfig]{
 		path:          "/profiles/" + profileId + "/analytics/status",
 		nextDNSClient: c,
 	}
@@ -192,8 +192,8 @@ type AnalyticsDomainsQueryConfig struct {
 	AnalyticsBaseQueryConfig
 }
 
-func (c *NextDNSClient) AnalyticDomains(profileId string) *AnalyticService[models.AnalyticDomain, AnalyticsDomainsQueryConfig] {
-	return &AnalyticService[models.AnalyticDomain, AnalyticsDomainsQueryConfig]{
+func (c *NextDNSClient) AnalyticDomains(profileId string) *TimeSeriesService[models.AnalyticDomain, AnalyticsDomainsQueryConfig] {
+	return &TimeSeriesService[models.AnalyticDomain, AnalyticsDomainsQueryConfig]{
 		path:          "/profiles/" + profileId + "/analytics/status",
 		nextDNSClient: c,
 	}
@@ -203,8 +203,8 @@ type AnalyticsReasonsQueryConfig struct {
 	AnalyticsBaseQueryConfig
 }
 
-func (c *NextDNSClient) AnalyticReasons(profileId string) *AnalyticService[models.AnalyticReason, AnalyticsReasonsQueryConfig] {
-	return &AnalyticService[models.AnalyticReason, AnalyticsReasonsQueryConfig]{
+func (c *NextDNSClient) AnalyticReasons(profileId string) *TimeSeriesService[models.AnalyticReason, AnalyticsReasonsQueryConfig] {
+	return &TimeSeriesService[models.AnalyticReason, AnalyticsReasonsQueryConfig]{
 		path:          "/profiles/" + profileId + "/analytics/reasons",
 		nextDNSClient: c,
 	}
@@ -214,8 +214,8 @@ type AnalyticsIpsQueryConfig struct {
 	AnalyticsBaseQueryConfig
 }
 
-func (c *NextDNSClient) AnalyticIps(profileId string) *AnalyticService[models.AnalyticIp, AnalyticsIpsQueryConfig] {
-	return &AnalyticService[models.AnalyticIp, AnalyticsIpsQueryConfig]{
+func (c *NextDNSClient) AnalyticIps(profileId string) *TimeSeriesService[models.AnalyticIp, AnalyticsIpsQueryConfig] {
+	return &TimeSeriesService[models.AnalyticIp, AnalyticsIpsQueryConfig]{
 		path:          "/profiles/" + profileId + "/analytics/ips",
 		nextDNSClient: c,
 	}
@@ -225,8 +225,8 @@ type AnalyticsDevicesQueryConfig struct {
 	AnalyticsBaseQueryConfig
 }
 
-func (c *NextDNSClient) AnalyticDevices(profileId string) *AnalyticService[models.AnalyticDevice, AnalyticsDevicesQueryConfig] {
-	return &AnalyticService[models.AnalyticDevice, AnalyticsDevicesQueryConfig]{
+func (c *NextDNSClient) AnalyticDevices(profileId string) *TimeSeriesService[models.AnalyticDevice, AnalyticsDevicesQueryConfig] {
+	return &TimeSeriesService[models.AnalyticDevice, AnalyticsDevicesQueryConfig]{
 		path:          "/profiles/" + profileId + "/analytics/devices",
 		nextDNSClient: c,
 	}
@@ -236,8 +236,8 @@ type AnalyticsProtocolsQueryConfig struct {
 	AnalyticsBaseQueryConfig
 }
 
-func (c *NextDNSClient) AnalyticProtocols(profileId string) *AnalyticService[models.AnalyticProtocol, AnalyticsProtocolsQueryConfig] {
-	return &AnalyticService[models.AnalyticProtocol, AnalyticsProtocolsQueryConfig]{
+func (c *NextDNSClient) AnalyticProtocols(profileId string) *TimeSeriesService[models.AnalyticProtocol, AnalyticsProtocolsQueryConfig] {
+	return &TimeSeriesService[models.AnalyticProtocol, AnalyticsProtocolsQueryConfig]{
 		path:          "/profiles/" + profileId + "/analytics/protocols",
 		nextDNSClient: c,
 	}
@@ -247,8 +247,8 @@ type AnalyticsQueryTypesQueryConfig struct {
 	AnalyticsBaseQueryConfig
 }
 
-func (c *NextDNSClient) AnalyticQueryTypes(profileId string) *AnalyticService[models.AnalyticQueryType, AnalyticsQueryTypesQueryConfig] {
-	return &AnalyticService[models.AnalyticQueryType, AnalyticsQueryTypesQueryConfig]{
+func (c *NextDNSClient) AnalyticQueryTypes(profileId string) *TimeSeriesService[models.AnalyticQueryType, AnalyticsQueryTypesQueryConfig] {
+	return &TimeSeriesService[models.AnalyticQueryType, AnalyticsQueryTypesQueryConfig]{
 		path:          "/profiles/" + profileId + "/analytics/queryTypes",
 		nextDNSClient: c,
 	}
@@ -258,8 +258,8 @@ type AnalyticsIpVersionsQueryConfig struct {
 	AnalyticsBaseQueryConfig
 }
 
-func (c *NextDNSClient) AnalyticIpVersions(profileId string) *AnalyticService[models.AnalyticIpVersion, AnalyticsIpVersionsQueryConfig] {
-	return &AnalyticService[models.AnalyticIpVersion, AnalyticsIpVersionsQueryConfig]{
+func (c *NextDNSClient) AnalyticIpVersions(profileId string) *TimeSeriesService[models.AnalyticIpVersion, AnalyticsIpVersionsQueryConfig] {
+	return &TimeSeriesService[models.AnalyticIpVersion, AnalyticsIpVersionsQueryConfig]{
 		path:          "/profiles/" + profileId + "/analytics/ipVersions",
 		nextDNSClient: c,
 	}
@@ -269,8 +269,8 @@ type AnalyticsDnssecQueryConfig struct {
 	AnalyticsBaseQueryConfig
 }
 
-func (c *NextDNSClient) AnalyticDnssec(profileId string) *AnalyticService[models.AnalyticDnssec, AnalyticsDnssecQueryConfig] {
-	return &AnalyticService[models.AnalyticDnssec, AnalyticsDnssecQueryConfig]{
+func (c *NextDNSClient) AnalyticDnssec(profileId string) *TimeSeriesService[models.AnalyticDnssec, AnalyticsDnssecQueryConfig] {
+	return &TimeSeriesService[models.AnalyticDnssec, AnalyticsDnssecQueryConfig]{
 		path:          "/profiles/" + profileId + "/analytics/dnssec",
 		nextDNSClient: c,
 	}
@@ -280,8 +280,8 @@ type AnalyticsEncryptionsQueryConfig struct {
 	AnalyticsBaseQueryConfig
 }
 
-func (c *NextDNSClient) AnalyticEncryptions(profileId string) *AnalyticService[models.AnalyticEncryption, AnalyticsEncryptionsQueryConfig] {
-	return &AnalyticService[models.AnalyticEncryption, AnalyticsEncryptionsQueryConfig]{
+func (c *NextDNSClient) AnalyticEncryptions(profileId string) *TimeSeriesService[models.AnalyticEncryption, AnalyticsEncryptionsQueryConfig] {
+	return &TimeSeriesService[models.AnalyticEncryption, AnalyticsEncryptionsQueryConfig]{
 		path:          "/profiles/" + profileId + "/analytics/encryption",
 		nextDNSClient: c,
 	}
@@ -291,8 +291,8 @@ type AnalyticsDestinationsCountriesQueryConfig struct {
 	AnalyticsBaseQueryConfig
 }
 
-func (c *NextDNSClient) AnalyticDesintationsCountrys(profileId string) *AnalyticService[models.AnalyticsDestinationCountries, AnalyticsDestinationsCountriesQueryConfig] {
-	return &AnalyticService[models.AnalyticsDestinationCountries, AnalyticsDestinationsCountriesQueryConfig]{
+func (c *NextDNSClient) AnalyticDesintationsCountrys(profileId string) *TimeSeriesService[models.AnalyticsDestinationCountries, AnalyticsDestinationsCountriesQueryConfig] {
+	return &TimeSeriesService[models.AnalyticsDestinationCountries, AnalyticsDestinationsCountriesQueryConfig]{
 		path:          "/profiles/" + profileId + "/analytics/destinations?type=countries",
 		nextDNSClient: c,
 	}
@@ -302,8 +302,8 @@ type AnalyticsDestinationsGafamQueryConfig struct {
 	AnalyticsBaseQueryConfig
 }
 
-func (c *NextDNSClient) AnalyticDestination(profileId string) *AnalyticService[models.AnalyticDestinationGafam, AnalyticsDestinationsGafamQueryConfig] {
-	return &AnalyticService[models.AnalyticDestinationGafam, AnalyticsDestinationsGafamQueryConfig]{
+func (c *NextDNSClient) AnalyticDestination(profileId string) *TimeSeriesService[models.AnalyticDestinationGafam, AnalyticsDestinationsGafamQueryConfig] {
+	return &TimeSeriesService[models.AnalyticDestinationGafam, AnalyticsDestinationsGafamQueryConfig]{
 		path:          "/profiles/" + profileId + "/analytics/destinations?type=gafam",
 		nextDNSClient: c,
 	}

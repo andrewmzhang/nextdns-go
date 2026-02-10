@@ -28,7 +28,7 @@ func TestAnalyticStatus(t *testing.T) {
 
 	config := services.AnalyticsDevicesQueryConfig{}
 	config.From = "-3M"
-	analyticStatuses, err := client.AnalyticDevices("8d2963").ListAll(ctx, config, false)
+	analyticStatuses, err := client.AnalyticDevices(create.ID).ListAll(ctx, config, false)
 	require.NoError(t, err)
 	fmt.Println(analyticStatuses)
 

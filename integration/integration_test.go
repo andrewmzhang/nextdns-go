@@ -28,8 +28,8 @@ func TestMain(m *testing.M) {
 	}
 	nextdnsApiToken = os.Getenv("NEXTDNS_API_TOKEN")
 	if nextdnsApiToken == "" {
-		fmt.Println("Skipping integration tests: API_BASE_URL or API_AUTH_TOKEN not set")
-		os.Exit(0)
+		fmt.Println("Failing integration tests: NEXTDNS_API_TOKEN not set")
+		os.Exit(1)
 	}
 	var err error
 	client, err = services.NewClient(services.WithAPIKey(nextdnsApiToken))
