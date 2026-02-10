@@ -16,7 +16,8 @@ jobs:
       # Validate required secrets
       - name: Check Required Secrets
         run: |
-          if [ -z "${{ secrets.NEXTDNS_API_TOKEN }}" ] || { [ -z "${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}" ] && [ -z "${{ secrets.OP_NEXTDNS_API_TOKEN_REF }}" ]; }; then
+          # If missing nextdns token AND missing OP_SERVICE_ACCOUNT_TOKEN or OP_NEXTDNS_API_TOKEN_REF, fail the test early
+          if [ -z "${{ secrets.NEXTDNS_API_TOKEN }}" ] && { [ -z "${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}" ] || [ -z "${{ secrets.OP_NEXTDNS_API_TOKEN_REF }}" ]; }; then
             echo "ERROR: You must provide either NEXTDNS_API_TOKEN, or both OP_SERVICE_ACCOUNT_TOKEN and OP_NEXTDNS_API_TOKEN_REF."
             exit 1
           fi
