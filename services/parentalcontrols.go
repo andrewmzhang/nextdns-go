@@ -7,16 +7,20 @@ import (
 type BoundParentalControl struct {
 	boundPath     string
 	nextDNSClient *NextDNSClient
-	GetableResource[models.ParentalControl]
+	err           error
+	GetableResource[models.ParentalControl, *BoundParentalControl]
 	UpdatableResource[models.ParentalControl]
 	// DeletableResource[models.ParentalControl]
 }
 
-func (b *BoundParentalControl) SetBind(nextDNSClient *NextDNSClient, bindPath string, err error) *BoundParentalControl {
+func (b *BoundParentalControl) GetError() error {
+	return b.err
+}
+
+func (b *BoundParentalControl) SetBind(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}) T {
 	if b == nil {
 		b = &BoundParentalControl{}
 	}
-	b.GetableResource.boundPath = bindPath
 	b.GetableResource.nextDNSClient = nextDNSClient
 	b.UpdatableResource.boundPath = bindPath
 	b.UpdatableResource.nextDNSClient = nextDNSClient

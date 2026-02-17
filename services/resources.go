@@ -140,36 +140,41 @@ func (r *CreatableResource[T]) Create(ctx context.Context, payload T) (*T, error
 	return &result.Data, err
 }
 
-type BindableResource[T any, V HasBind[V]] struct {
+type BindableResource[T any, BoundResource HasBind[BoundResource]] struct {
 	nextDNSClient    *NextDNSClient
 	bindGeneratingFn func(string) string
 }
 
-func (r *BindableResource[T, V]) Bind(id string) V {
+func (r *BindableResource[T, BoundResource]) Bind(id string) BoundResource {
 	var err error
 	if id == "" {
 		err = errors.New("id is required")
 	}
 
-	var v V
-	return v.SetBind(r.nextDNSClient, r.bindGeneratingFn(id), err)
+	var v BoundResource
+	return v.SetBind(r.nextDNSClient, "", nil, err)
 }
 
-type GetableResource[T any] struct {
+type GetableResource[T any, Parent BoundResource] struct {
+	parent        Parent
 	nextDNSClient *NextDNSClient
-	boundPath     string
-	err           error
+	pathFmt       string
+	pathArgs      map[string]interface{}
 }
 
-func (r *GetableResource[T]) Get(ctx context.Context) (*T, error) {
-	if r.err != nil {
-		return nil, r.err
+func (r *GetableResource[T, Parent]) Get(ctx context.Context) (*T, error) {
+	if r.parent.GetError() != nil {
+		return nil, r.parent.GetError()
 	}
-
+	path, err := r.parent.GetBoundPath()
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("path:", path)
 	var result DataWrapper[T]
 	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).
 		SetResult(&result).
-		Get(r.boundPath)
+		Get(path)
 	if err != nil {
 		return nil, err
 	}

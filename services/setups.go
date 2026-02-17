@@ -7,16 +7,20 @@ import (
 type BoundSetup struct {
 	boundPath     string
 	nextDNSClient *NextDNSClient
-	GetableResource[models.Setup]
+	GetableResource[models.Setup, *BoundSetup]
 	UpdatableResource[models.Setup]
 	DeletableResource[models.Setup]
 }
 
-func (b *BoundSetup) SetBind(nextDNSClient *NextDNSClient, bindPath string, err error) *BoundSetup {
+func (b *BoundSetup) GetError() error {
+	// Todo Implement this
+	return nil
+}
+
+func (b *BoundSetup) SetBind(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}) T {
 	if b == nil {
 		b = &BoundSetup{}
 	}
-	b.GetableResource.boundPath = bindPath
 	b.GetableResource.nextDNSClient = nextDNSClient
 	b.UpdatableResource.boundPath = bindPath
 	b.UpdatableResource.nextDNSClient = nextDNSClient

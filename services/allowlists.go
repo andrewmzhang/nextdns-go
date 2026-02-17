@@ -15,7 +15,7 @@ type BoundAllowlist struct {
 	DeletableResource[models.Allowlist]
 }
 
-func (b *BoundAllowlist) SetBind(nextDNSClient *NextDNSClient, bindPath string, err error) *BoundAllowlist {
+func (b *BoundAllowlist) SetBind(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}) T {
 	if b == nil {
 		b = &BoundAllowlist{}
 	}

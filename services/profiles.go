@@ -5,20 +5,38 @@ import (
 )
 
 type BoundProfile struct {
-	GetableResource[models.Profile]
+	err           error
+	pathFmt       string
+	pathArgs      map[string]interface{}
+	nextDNSClient *NextDNSClient
+	GetableResource[models.Profile, *BoundProfile]
 	UpdatableResource[models.Profile]
 	DeletableResource[models.Profile]
 }
 
-func (b *BoundProfile) SetBind(nextDNSClient *NextDNSClient, bindPath string, err error) *BoundProfile {
+func (b *BoundProfile) GetNextDNSClient() *NextDNSClient {
+	return b.nextDNSClient
+}
+
+func (b *BoundProfile) GetBoundPath() (string, error) {
+	var path string
+	path, b.err = renderPath(b.pathFmt, b.pathArgs)
+	return path, b.err
+}
+
+func (b *BoundProfile) GetError() error {
+	return b.err
+}
+
+func (b *BoundProfile) SetBind(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}) *BoundProfile {
 	if b == nil {
 		b = &BoundProfile{}
 	}
-	b.GetableResource.boundPath = bindPath
+	b.GetableResource.parent = b
 	b.GetableResource.nextDNSClient = nextDNSClient
-	b.UpdatableResource.boundPath = bindPath
+	b.UpdatableResource.boundPath = pathFmt
 	b.UpdatableResource.nextDNSClient = nextDNSClient
-	b.DeletableResource.boundPath = bindPath
+	b.DeletableResource.boundPath = pathFmt
 	b.DeletableResource.nextDNSClient = nextDNSClient
 	return b
 }

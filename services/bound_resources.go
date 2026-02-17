@@ -1,10 +1,11 @@
 package services
 
-type BoundResource[T any] struct {
-	nextDNSClient *NextDNSClient
-	path          string
+type HasBind[T any] interface {
+	SetBind(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}, err error) T
 }
 
-type HasBind[T any] interface {
-	SetBind(nextDNSClient *NextDNSClient, bindpath string, err error) T
+type BoundResource interface {
+	GetError() error
+	GetNextDNSClient() *NextDNSClient
+	GetBoundPath() (string, error)
 }

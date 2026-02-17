@@ -7,16 +7,21 @@ import (
 type BoundSecurity struct {
 	boundPath     string
 	nextDNSClient *NextDNSClient
-	GetableResource[models.Security]
+	err           error
+	GetableResource[models.Security, *BoundSecurity]
 	UpdatableResource[models.Security]
 	DeletableResource[models.Security]
 }
 
-func (b *BoundSecurity) SetBind(nextDNSClient *NextDNSClient, bindPath string, err error) *BoundSecurity {
+func (b *BoundSecurity) GetError() error {
+	return b.err
+}
+
+func (b *BoundSecurity) SetBind(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}) T {
 	if b == nil {
 		b = &BoundSecurity{}
 	}
-	b.GetableResource.boundPath = bindPath
+	b.GetableResource.parent = b
 	b.GetableResource.nextDNSClient = nextDNSClient
 	b.UpdatableResource.boundPath = bindPath
 	b.UpdatableResource.nextDNSClient = nextDNSClient

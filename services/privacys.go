@@ -7,16 +7,21 @@ import (
 type BoundPrivacy struct {
 	boundPath     string
 	nextDNSClient *NextDNSClient
-	GetableResource[models.Privacy]
+	err           error
+	GetableResource[models.Privacy, *BoundPrivacy]
 	UpdatableResource[models.Privacy]
 	// DeletableResource[models.Privacy]
 }
 
-func (b *BoundPrivacy) SetBind(nextDNSClient *NextDNSClient, bindPath string, err error) *BoundPrivacy {
+func (b *BoundPrivacy) GetError() error {
+	return b.err
+}
+
+func (b *BoundPrivacy) SetBind(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}) T {
 	if b == nil {
 		b = &BoundPrivacy{}
 	}
-	b.GetableResource.boundPath = bindPath
+	b.GetableResource.parent = b
 	b.GetableResource.nextDNSClient = nextDNSClient
 	b.UpdatableResource.boundPath = bindPath
 	b.UpdatableResource.nextDNSClient = nextDNSClient
@@ -34,14 +39,6 @@ type PrivacyService struct {
 
 func (c *NextDNSClient) Privacy(profileId string) *BoundPrivacy {
 	r := &PrivacyService{
-		// ListableResource: ListableResource[models.Privacy]{
-		// 	nextDNSClient: c,
-		// 	pathFmt:          "/profiles",
-		// },
-		// CreatableResource: CreatableResource[models.Privacy]{
-		// 	nextDNSClient: c,
-		// 	pathFmt:          "/profiles",
-		// },
 		BindableResource: BindableResource[models.Privacy, *BoundPrivacy]{
 			nextDNSClient: c,
 			bindGeneratingFn: func(s string) string {
@@ -53,10 +50,7 @@ func (c *NextDNSClient) Privacy(profileId string) *BoundPrivacy {
 }
 
 type PrivacyBlocklistsService struct {
-	// pathFmt string
 	ListableResource[models.PrivacyBlocklists]
-	// CreatableResource[models.Privacy]
-	// BindableResource[models.Privacy, *BoundPrivacy]
 }
 
 func (c *NextDNSClient) PrivacyBlocklists() *PrivacyBlocklistsService {
@@ -65,25 +59,12 @@ func (c *NextDNSClient) PrivacyBlocklists() *PrivacyBlocklistsService {
 			nextDNSClient: c,
 			pathFmt:       "/privacy/blocklists",
 		},
-		// CreatableResource: CreatableResource[models.Privacy]{
-		// 	nextDNSClient: c,
-		// 	pathFmt:          "/profiles",
-		// },
-		// BindableResource: BindableResource[models.Privacy, *BoundPrivacy]{
-		// 	nextDNSClient: c,
-		// 	pathFmt:          "/profiles",
-		// 	bindGeneratingFn: func(s string) string {
-		// 		return "/profiles/" + s + "/privacy"
-		// 	},
-		// },
 	}
 }
 
 type PrivacyNativesService struct {
 	// pathFmt string
 	ListableResource[models.PrivacyNatives]
-	// CreatableResource[models.Privacy]
-	// BindableResource[models.Privacy, *BoundPrivacy]
 }
 
 func (c *NextDNSClient) PrivacyNatives() *PrivacyNativesService {
@@ -92,16 +73,5 @@ func (c *NextDNSClient) PrivacyNatives() *PrivacyNativesService {
 			nextDNSClient: c,
 			pathFmt:       "/privacy/natives",
 		},
-		// CreatableResource: CreatableResource[models.Privacy]{
-		// 	nextDNSClient: c,
-		// 	pathFmt:          "/profiles",
-		// },
-		// BindableResource: BindableResource[models.Privacy, *BoundPrivacy]{
-		// 	nextDNSClient: c,
-		// 	pathFmt:          "/profiles",
-		// 	bindGeneratingFn: func(s string) string {
-		// 		return "/profiles/" + s + "/privacy"
-		// 	},
-		// },
 	}
 }
