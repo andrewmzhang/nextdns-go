@@ -34,51 +34,6 @@ type DataListMetaWrapper[T any] struct {
 	Meta Meta `json:"meta"`
 }
 
-// Resource represents a NextDNS top-level construct, e.g. Profile
-type Resource[T any] struct {
-	nextDNSClient   *NextDNSClient
-	path            string
-	isSupportList   bool
-	isSupportCreate bool
-	isSupportBind   bool
-}
-
-func (r *Resource[T]) List(
-	ctx context.Context,
-) ([]T, error) {
-	results := &struct {
-		Data []T `json:"data"`
-	}{}
-	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).SetResult(&results).Get(r.path)
-	if err != nil {
-		return nil, err
-	}
-	err = handleResponse(resp, results)
-	return results.Data, err
-}
-
-func (r *Resource[T]) Create(ctx context.Context, payload T) (*T, error) {
-	if !r.isSupportCreate {
-		return nil, fmt.Errorf("create is not supported by this resource")
-	}
-	result := &struct {
-		Data T `json:"data"`
-	}{}
-	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).SetBody(payload).SetResult(&result).Post(r.path)
-	if err != nil {
-		return nil, err
-	}
-	err = handleResponse(resp, result)
-	return &result.Data, err
-}
-
-func (r *Resource[T]) Bind(id string) *BoundResource[T] {
-	return &BoundResource[T]{
-		nextDNSClient: r.nextDNSClient,
-		path:          r.path + "/" + fmt.Sprint(id),
-	}
-}
-
 type APIError struct {
 	Status  int    `json:"status"`
 	Code    string `json:"code"`
