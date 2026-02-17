@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bytes"
 	"context"
 	"encoding/hex"
 	"encoding/json"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"resty.dev/v3"
 )
@@ -61,19 +63,54 @@ func handleResponse[T any](resp *resty.Response, result *T) error {
 	return nil
 }
 
+func validateNoEmptyStrings(data map[string]interface{}) error {
+	for k, v := range data {
+		if s, ok := v.(string); ok {
+			if s == "" {
+				return fmt.Errorf("field %q cannot be empty", k)
+			}
+		}
+	}
+	return nil
+}
+
+func renderPath(tmplStr string, data map[string]interface{}) (string, error) {
+	if err := validateNoEmptyStrings(data); err != nil {
+		return "", err
+	}
+
+	tmpl, err := template.New("tmpl").Option("missingkey=error").Parse(tmplStr)
+	if err != nil {
+		return "", err
+	}
+
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, data); err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
+}
+
 // Resource represents a NextDNS top-level construct, e.g. Profile
 type ListableResource[T any] struct {
 	nextDNSClient *NextDNSClient
-	path          string
+	pathFmt       string
+	pathArgs      map[string]interface{}
 }
 
 func (r *ListableResource[T]) List(
 	ctx context.Context,
 ) ([]T, error) {
+	path, err := renderPath(r.pathFmt, r.pathArgs)
+	if err != nil {
+		return nil, err
+	}
+
 	results := &struct {
 		Data []T `json:"data"`
 	}{}
-	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).SetResult(&results).Get(r.path)
+	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).SetResult(&results).Get(path)
 	if err != nil {
 		return nil, err
 	}
@@ -83,14 +120,19 @@ func (r *ListableResource[T]) List(
 
 type CreatableResource[T any] struct {
 	nextDNSClient *NextDNSClient
-	path          string
+	pathFmt       string
+	pathArgs      map[string]interface{}
 }
 
 func (r *CreatableResource[T]) Create(ctx context.Context, payload T) (*T, error) {
+	path, err := renderPath(r.pathFmt, r.pathArgs)
+	if err != nil {
+		return nil, err
+	}
 	result := &struct {
 		Data T `json:"data"`
 	}{}
-	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).SetBody(payload).SetResult(&result).Post(r.path)
+	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).SetBody(payload).SetResult(&result).Post(path)
 	if err != nil {
 		return nil, err
 	}

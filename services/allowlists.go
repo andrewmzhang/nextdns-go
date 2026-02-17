@@ -29,7 +29,7 @@ func (b *BoundAllowlist) SetBind(nextDNSClient *NextDNSClient, bindPath string) 
 }
 
 type AllowlistService struct {
-	// path string
+	// pathFmt string
 	ListableResource[models.Allowlist]
 	CreatableResource[models.Allowlist]
 	BindableResource[models.Allowlist, *BoundAllowlist]
@@ -39,11 +39,17 @@ func (c *NextDNSClient) Allowlists(profileId string) *AllowlistService {
 	return &AllowlistService{
 		ListableResource: ListableResource[models.Allowlist]{
 			nextDNSClient: c,
-			path:          "/profiles/" + profileId + "/allowlist",
+			pathFmt:       "/profiles/{{ .profileId }}/allowlist",
+			pathArgs: map[string]interface{}{
+				"profileId": profileId,
+			},
 		},
 		CreatableResource: CreatableResource[models.Allowlist]{
 			nextDNSClient: c,
-			path:          "/profiles/" + profileId + "/allowlist",
+			pathFmt:       "/profiles/{{ .profileId }}/allowlist",
+			pathArgs: map[string]interface{}{
+				"profileId": profileId,
+			},
 		},
 		BindableResource: BindableResource[models.Allowlist, *BoundAllowlist]{
 			nextDNSClient: c,

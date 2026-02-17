@@ -26,7 +26,7 @@ func (b *BoundPrivacy) SetBind(nextDNSClient *NextDNSClient, bindPath string) *B
 }
 
 type PrivacyService struct {
-	// path string
+	// pathFmt string
 	// ListableResource[models.Privacy]
 	// CreatableResource[models.Privacy]
 	BindableResource[models.Privacy, *BoundPrivacy]
@@ -36,11 +36,11 @@ func (c *NextDNSClient) Privacy(profileId string) *BoundPrivacy {
 	r := &PrivacyService{
 		// ListableResource: ListableResource[models.Privacy]{
 		// 	nextDNSClient: c,
-		// 	path:          "/profiles",
+		// 	pathFmt:          "/profiles",
 		// },
 		// CreatableResource: CreatableResource[models.Privacy]{
 		// 	nextDNSClient: c,
-		// 	path:          "/profiles",
+		// 	pathFmt:          "/profiles",
 		// },
 		BindableResource: BindableResource[models.Privacy, *BoundPrivacy]{
 			nextDNSClient: c,
@@ -53,7 +53,7 @@ func (c *NextDNSClient) Privacy(profileId string) *BoundPrivacy {
 }
 
 type PrivacyBlocklistsService struct {
-	// path string
+	// pathFmt string
 	ListableResource[models.PrivacyBlocklists]
 	// CreatableResource[models.Privacy]
 	// BindableResource[models.Privacy, *BoundPrivacy]
@@ -63,15 +63,15 @@ func (c *NextDNSClient) PrivacyBlocklists() *PrivacyBlocklistsService {
 	return &PrivacyBlocklistsService{
 		ListableResource: ListableResource[models.PrivacyBlocklists]{
 			nextDNSClient: c,
-			path:          "/privacy/blocklists",
+			pathFmt:       "/privacy/blocklists",
 		},
 		// CreatableResource: CreatableResource[models.Privacy]{
 		// 	nextDNSClient: c,
-		// 	path:          "/profiles",
+		// 	pathFmt:          "/profiles",
 		// },
 		// BindableResource: BindableResource[models.Privacy, *BoundPrivacy]{
 		// 	nextDNSClient: c,
-		// 	path:          "/profiles",
+		// 	pathFmt:          "/profiles",
 		// 	bindGeneratingFn: func(s string) string {
 		// 		return "/profiles/" + s + "/privacy"
 		// 	},
@@ -80,7 +80,7 @@ func (c *NextDNSClient) PrivacyBlocklists() *PrivacyBlocklistsService {
 }
 
 type PrivacyNativesService struct {
-	// path string
+	// pathFmt string
 	ListableResource[models.PrivacyNatives]
 	// CreatableResource[models.Privacy]
 	// BindableResource[models.Privacy, *BoundPrivacy]
@@ -90,15 +90,15 @@ func (c *NextDNSClient) PrivacyNatives() *PrivacyNativesService {
 	return &PrivacyNativesService{
 		ListableResource: ListableResource[models.PrivacyNatives]{
 			nextDNSClient: c,
-			path:          "/privacy/natives",
+			pathFmt:       "/privacy/natives",
 		},
 		// CreatableResource: CreatableResource[models.Privacy]{
 		// 	nextDNSClient: c,
-		// 	path:          "/profiles",
+		// 	pathFmt:          "/profiles",
 		// },
 		// BindableResource: BindableResource[models.Privacy, *BoundPrivacy]{
 		// 	nextDNSClient: c,
-		// 	path:          "/profiles",
+		// 	pathFmt:          "/profiles",
 		// 	bindGeneratingFn: func(s string) string {
 		// 		return "/profiles/" + s + "/privacy"
 		// 	},

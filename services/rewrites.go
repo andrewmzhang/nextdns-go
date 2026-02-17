@@ -29,7 +29,7 @@ func (b *BoundRewrite) SetBind(nextDNSClient *NextDNSClient, bindPath string) *B
 }
 
 type RewriteService struct {
-	// path string
+	// pathFmt string
 	ListableResource[models.Rewrite]
 	CreatableResource[models.Rewrite]
 	BindableResource[models.Rewrite, *BoundRewrite]
@@ -39,11 +39,17 @@ func (c *NextDNSClient) Rewrites(profileId string) *RewriteService {
 	r := &RewriteService{
 		ListableResource: ListableResource[models.Rewrite]{
 			nextDNSClient: c,
-			path:          "/profiles/" + profileId + "/rewrites",
+			pathFmt:       "/profiles/{{ .profileId }}/rewrites",
+			pathArgs: map[string]interface{}{
+				"profileId": profileId,
+			},
 		},
 		CreatableResource: CreatableResource[models.Rewrite]{
 			nextDNSClient: c,
-			path:          "/profiles/" + profileId + "/rewrites",
+			pathFmt:       "/profiles/{{ .profileId }}/rewrites",
+			pathArgs: map[string]interface{}{
+				"profileId": profileId,
+			},
 		},
 		BindableResource: BindableResource[models.Rewrite, *BoundRewrite]{
 			nextDNSClient: c,

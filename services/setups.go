@@ -26,7 +26,7 @@ func (b *BoundSetup) SetBind(nextDNSClient *NextDNSClient, bindPath string) *Bou
 }
 
 type SetupService struct {
-	// path string
+	// pathFmt string
 	// ListableResource[models.Setup]
 	// CreatableResource[models.Setup]
 	BindableResource[models.Setup, *BoundSetup]

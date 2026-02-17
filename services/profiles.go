@@ -26,7 +26,7 @@ func (b *BoundProfile) SetBind(nextDNSClient *NextDNSClient, bindPath string) *B
 }
 
 type ProfileService struct {
-	// path string
+	// pathFmt string
 	ListableResource[models.Profile]
 	CreatableResource[models.Profile]
 	BindableResource[models.Profile, *BoundProfile]
@@ -36,11 +36,11 @@ func (c *NextDNSClient) Profiles() *ProfileService {
 	return &ProfileService{
 		ListableResource: ListableResource[models.Profile]{
 			nextDNSClient: c,
-			path:          "/profiles",
+			pathFmt:       "/profiles",
 		},
 		CreatableResource: CreatableResource[models.Profile]{
 			nextDNSClient: c,
-			path:          "/profiles",
+			pathFmt:       "/profiles",
 		},
 		BindableResource: BindableResource[models.Profile, *BoundProfile]{
 			nextDNSClient: c,

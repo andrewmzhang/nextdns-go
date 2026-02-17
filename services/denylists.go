@@ -29,7 +29,7 @@ func (b *BoundDenylist) SetBind(nextDNSClient *NextDNSClient, bindPath string) *
 }
 
 type DenylistService struct {
-	// path string
+	// pathFmt string
 	ListableResource[models.Denylist]
 	CreatableResource[models.Denylist]
 	BindableResource[models.Denylist, *BoundDenylist]
@@ -39,11 +39,17 @@ func (c *NextDNSClient) Denylists(profileId string) *DenylistService {
 	return &DenylistService{
 		ListableResource: ListableResource[models.Denylist]{
 			nextDNSClient: c,
-			path:          "/profiles/" + profileId + "/denylist",
+			pathFmt:       "/profiles/{{ .profileId }}/denylist",
+			pathArgs: map[string]interface{}{
+				"profileId": profileId,
+			},
 		},
 		CreatableResource: CreatableResource[models.Denylist]{
 			nextDNSClient: c,
-			path:          "/profiles/" + profileId + "/denylist",
+			pathFmt:       "/profiles/{{ .profileId }}/denylist",
+			pathArgs: map[string]interface{}{
+				"profileId": profileId,
+			},
 		},
 		BindableResource: BindableResource[models.Denylist, *BoundDenylist]{
 			nextDNSClient: c,
