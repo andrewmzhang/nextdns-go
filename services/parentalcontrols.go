@@ -12,7 +12,7 @@ type BoundParentalControl struct {
 	// DeletableResource[models.ParentalControl]
 }
 
-func (b *BoundParentalControl) SetBind(nextDNSClient *NextDNSClient, bindPath string) *BoundParentalControl {
+func (b *BoundParentalControl) SetBind(nextDNSClient *NextDNSClient, bindPath string, err error) *BoundParentalControl {
 	if b == nil {
 		b = &BoundParentalControl{}
 	}

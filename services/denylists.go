@@ -15,7 +15,7 @@ type BoundDenylist struct {
 	DeletableResource[models.Denylist]
 }
 
-func (b *BoundDenylist) SetBind(nextDNSClient *NextDNSClient, bindPath string) *BoundDenylist {
+func (b *BoundDenylist) SetBind(nextDNSClient *NextDNSClient, bindPath string, err error) *BoundDenylist {
 	if b == nil {
 		b = &BoundDenylist{}
 	}

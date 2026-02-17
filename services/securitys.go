@@ -12,7 +12,7 @@ type BoundSecurity struct {
 	DeletableResource[models.Security]
 }
 
-func (b *BoundSecurity) SetBind(nextDNSClient *NextDNSClient, bindPath string) *BoundSecurity {
+func (b *BoundSecurity) SetBind(nextDNSClient *NextDNSClient, bindPath string, err error) *BoundSecurity {
 	if b == nil {
 		b = &BoundSecurity{}
 	}

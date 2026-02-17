@@ -12,7 +12,7 @@ type BoundPrivacy struct {
 	// DeletableResource[models.Privacy]
 }
 
-func (b *BoundPrivacy) SetBind(nextDNSClient *NextDNSClient, bindPath string) *BoundPrivacy {
+func (b *BoundPrivacy) SetBind(nextDNSClient *NextDNSClient, bindPath string, err error) *BoundPrivacy {
 	if b == nil {
 		b = &BoundPrivacy{}
 	}

@@ -146,20 +146,25 @@ type BindableResource[T any, V HasBind[V]] struct {
 }
 
 func (r *BindableResource[T, V]) Bind(id string) V {
-	if len(id) == 0 {
-		panic("id is required")
+	var err error
+	if id == "" {
+		err = errors.New("id is required")
 	}
 
 	var v V
-	return v.SetBind(r.nextDNSClient, r.bindGeneratingFn(id))
+	return v.SetBind(r.nextDNSClient, r.bindGeneratingFn(id), err)
 }
 
 type GetableResource[T any] struct {
 	nextDNSClient *NextDNSClient
 	boundPath     string
+	err           error
 }
 
 func (r *GetableResource[T]) Get(ctx context.Context) (*T, error) {
+	if r.err != nil {
+		return nil, r.err
+	}
 
 	var result DataWrapper[T]
 	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).

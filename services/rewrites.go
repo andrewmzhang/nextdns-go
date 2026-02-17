@@ -13,7 +13,7 @@ type BoundRewrite struct {
 	DeletableResource[models.Rewrite]
 }
 
-func (b *BoundRewrite) SetBind(nextDNSClient *NextDNSClient, bindPath string) *BoundRewrite {
+func (b *BoundRewrite) SetBind(nextDNSClient *NextDNSClient, bindPath string, err error) *BoundRewrite {
 	if b == nil {
 		b = &BoundRewrite{}
 	}

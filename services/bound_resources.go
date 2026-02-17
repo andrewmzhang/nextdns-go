@@ -6,5 +6,5 @@ type BoundResource[T any] struct {
 }
 
 type HasBind[T any] interface {
-	SetBind(nextDNSClient *NextDNSClient, bindpath string) T
+	SetBind(nextDNSClient *NextDNSClient, bindpath string, err error) T
 }

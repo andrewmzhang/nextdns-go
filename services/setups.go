@@ -12,7 +12,7 @@ type BoundSetup struct {
 	DeletableResource[models.Setup]
 }
 
-func (b *BoundSetup) SetBind(nextDNSClient *NextDNSClient, bindPath string) *BoundSetup {
+func (b *BoundSetup) SetBind(nextDNSClient *NextDNSClient, bindPath string, err error) *BoundSetup {
 	if b == nil {
 		b = &BoundSetup{}
 	}
