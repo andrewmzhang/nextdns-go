@@ -1,7 +1,7 @@
 package services
 
-type HasBind[T any] interface {
-	SetBind(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}, err error) T
+type HasInit[BoundResourcePtr any] interface {
+	InitBoundResource(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}, err error) BoundResourcePtr
 }
 
 type BoundResource interface {

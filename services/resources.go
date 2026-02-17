@@ -137,10 +137,13 @@ func (r *CreatableResource[T]) Create(ctx context.Context, payload T) (*T, error
 		return nil, err
 	}
 	err = handleResponse(resp, result)
-	return &result.Data, err
+	if err != nil {
+		return nil, err
+	}
+	return &result.Data, nil
 }
 
-type BindableResource[T any, BoundResource HasBind[BoundResource]] struct {
+type BindableResource[T any, BoundResource HasInit[BoundResource]] struct {
 	nextDNSClient *NextDNSClient
 	pathFmt       string
 	pathArgs      map[string]interface{}
@@ -149,7 +152,7 @@ type BindableResource[T any, BoundResource HasBind[BoundResource]] struct {
 func (r *BindableResource[T, BoundResource]) Bind(id string) BoundResource {
 	var err error
 	if id == "" {
-		err = errors.New("id is required")
+		err = errors.New("bind id is required")
 	}
 
 	newPathArgs := map[string]interface{}{
@@ -160,7 +163,7 @@ func (r *BindableResource[T, BoundResource]) Bind(id string) BoundResource {
 	}
 
 	var v BoundResource
-	return v.SetBind(r.nextDNSClient, r.pathFmt, newPathArgs, err)
+	return v.InitBoundResource(r.nextDNSClient, r.pathFmt, newPathArgs, err)
 }
 
 type GetableResource[T any, Parent BoundResource] struct {
@@ -189,17 +192,23 @@ func (r *GetableResource[T, Parent]) Get(ctx context.Context) (*T, error) {
 
 // ListGetableResource not all resource endpoints support get. The Get method under this type will call list on the parent
 // resource and filter the results for desired item
-type ListGetableResource[T any] struct {
-	nextDNSClient *NextDNSClient
-	boundPath     string
+type ListGetableResource[T any, Parent BoundResource] struct {
+	parent Parent
 }
 
-func (r *ListGetableResource[T]) Get(ctx context.Context) (*T, error) {
+func (r *ListGetableResource[T, Parent]) Get(ctx context.Context) (*T, error) {
+	if r.parent.GetError() != nil {
+		return nil, r.parent.GetError()
+	}
+	path, err := r.parent.GetBoundPath()
+	if err != nil {
+		return nil, err
+	}
 	results := &struct {
 		Data []T `json:"data"`
 	}{}
-	parent := filepath.Dir(r.boundPath)
-	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).
+	parent := filepath.Dir(path)
+	resp, err := r.parent.GetNextDNSClient().restyClient.R().SetContext(ctx).
 		SetResult(&results).
 		Get(parent)
 
@@ -208,7 +217,7 @@ func (r *ListGetableResource[T]) Get(ctx context.Context) (*T, error) {
 	}
 	err = handleResponse(resp, &results)
 
-	decodedId := filepath.Base(r.boundPath)
+	decodedId := filepath.Base(path)
 	if strings.HasPrefix(decodedId, "hex:") {
 		decodedId = strings.TrimPrefix(decodedId, "hex:")
 		bytes, err := hex.DecodeString(decodedId)
@@ -244,6 +253,9 @@ type UpdatableResource[T any, Parent BoundResource] struct {
 }
 
 func (r *UpdatableResource[T, Parent]) Update(ctx context.Context, payload any) error {
+	if r.parent.GetError() != nil {
+		return r.parent.GetError()
+	}
 	path, err := r.parent.GetBoundPath()
 	if err != nil {
 		return err
@@ -263,6 +275,9 @@ type DeletableResource[T any, Parent BoundResource] struct {
 }
 
 func (r *DeletableResource[T, Parent]) Delete(ctx context.Context) error {
+	if r.parent.GetError() != nil {
+		return r.parent.GetError()
+	}
 	path, err := r.parent.GetBoundPath()
 	if err != nil {
 		return err

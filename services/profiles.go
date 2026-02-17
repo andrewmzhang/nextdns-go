@@ -31,7 +31,7 @@ func (b *BoundProfile) GetError() error {
 	return b.err
 }
 
-func (b *BoundProfile) SetBind(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}, err error) *BoundProfile {
+func (b *BoundProfile) InitBoundResource(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}, err error) *BoundProfile {
 	if b == nil {
 		b = &BoundProfile{}
 	}

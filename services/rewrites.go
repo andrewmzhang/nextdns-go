@@ -1,30 +1,45 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/andrewmzhang/nextdns-go/models"
 )
 
 type BoundRewrite struct {
-	boundPath     string
+	err           error
+	pathFmt       string
+	pathArgs      map[string]interface{}
 	nextDNSClient *NextDNSClient
-	// GetableResource[models.Rewrite]
-	// UpdatableResource[models.Rewrite]
-	ListGetableResource[models.Rewrite]
-	DeletableResource[models.Rewrite]
+	ListGetableResource[models.Rewrite, *BoundRewrite]
+	DeletableResource[models.Rewrite, *BoundRewrite]
 }
 
-func (b *BoundRewrite) SetBind(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}) T {
+func (b *BoundRewrite) GetError() error {
+	return b.err
+}
+
+func (b *BoundRewrite) GetNextDNSClient() *NextDNSClient {
+	return b.nextDNSClient
+}
+
+func (b *BoundRewrite) GetBoundPath() (string, error) {
+	var path string
+	fmt.Println("pathFmt", b.pathFmt, "pathArgs", b.pathArgs)
+	path, b.err = renderPath(b.pathFmt, b.pathArgs)
+	return path, b.err
+}
+
+func (b *BoundRewrite) InitBoundResource(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}, err error) *BoundRewrite {
 	if b == nil {
 		b = &BoundRewrite{}
 	}
-	// b.GetableResource.boundPath = bindPath
-	// b.GetableResource.nextDNSClient = nextDNSClient
-	// b.UpdatableResource.boundPath = bindPath
-	// b.UpdatableResource.nextDNSClient = nextDNSClient
-	b.ListGetableResource.nextDNSClient = nextDNSClient
-	b.ListGetableResource.boundPath = bindPath
-	b.DeletableResource.boundPath = bindPath
-	b.DeletableResource.nextDNSClient = nextDNSClient
+	b.nextDNSClient = nextDNSClient
+	b.pathFmt = pathFmt
+	b.pathArgs = pathArgs
+	b.err = err
+	b.ListGetableResource.parent = b
+	b.DeletableResource.parent = b
 	return b
 }
 
@@ -53,8 +68,9 @@ func (c *NextDNSClient) Rewrites(profileId string) *RewriteService {
 		},
 		BindableResource: BindableResource[models.Rewrite, *BoundRewrite]{
 			nextDNSClient: c,
-			bindGeneratingFn: func(s string) string {
-				return "/profiles/" + profileId + "/rewrites/" + s
+			pathFmt:       "/profiles/{{ .profileId }}/rewrites/{{ .id }}",
+			pathArgs: map[string]interface{}{
+				"profileId": profileId,
 			},
 		},
 	}
