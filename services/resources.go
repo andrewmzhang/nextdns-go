@@ -257,6 +257,7 @@ func (r *UpdatableResource[T, Parent]) Update(ctx context.Context, payload any) 
 		return r.parent.GetError()
 	}
 	path, err := r.parent.GetBoundPath()
+	fmt.Println("UpdatePath:", path)
 	if err != nil {
 		return err
 	}

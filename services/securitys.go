@@ -5,63 +5,58 @@ import (
 )
 
 type BoundSecurity struct {
-	boundPath     string
-	nextDNSClient *NextDNSClient
 	err           error
+	pathFmt       string
+	pathArgs      map[string]interface{}
+	nextDNSClient *NextDNSClient
 	GetableResource[models.Security, *BoundSecurity]
-	UpdatableResource[models.Security]
-	DeletableResource[models.Security]
+	UpdatableResource[models.Security, *BoundSecurity]
+}
+
+func (b *BoundSecurity) GetNextDNSClient() *NextDNSClient {
+	return b.nextDNSClient
+}
+
+func (b *BoundSecurity) GetBoundPath() (string, error) {
+	var path string
+	path, b.err = renderPath(b.pathFmt, b.pathArgs)
+	return path, b.err
 }
 
 func (b *BoundSecurity) GetError() error {
 	return b.err
 }
 
-func (b *BoundSecurity) SetBind(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}) T {
+func (b *BoundSecurity) InitBoundResource(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}, err error) *BoundSecurity {
 	if b == nil {
 		b = &BoundSecurity{}
 	}
+	b.nextDNSClient = nextDNSClient
+	b.pathFmt = pathFmt
+	b.pathArgs = pathArgs
+	b.err = err
 	b.GetableResource.parent = b
-	b.GetableResource.nextDNSClient = nextDNSClient
-	b.UpdatableResource.boundPath = bindPath
-	b.UpdatableResource.nextDNSClient = nextDNSClient
-	b.DeletableResource.boundPath = bindPath
-	b.DeletableResource.nextDNSClient = nextDNSClient
+	b.UpdatableResource.parent = b
 	return b
 }
 
 type SecurityService struct {
-	// pathFmt string
-	// ListableResource[models.Security]
-	// CreatableResource[models.Security]
 	BindableResource[models.Security, *BoundSecurity]
 }
 
 func (c *NextDNSClient) Security(profileId string) *BoundSecurity {
 	r := &SecurityService{
-		// ListableResource: ListableResource[models.Security]{
-		// 	nextDNSClient: c,
-		// 	pathFmt:          "/profiles",
-		// },
-		// CreatableResource: CreatableResource[models.Security]{
-		// 	nextDNSClient: c,
-		// 	pathFmt:          "/profiles",
-		// },
 		BindableResource: BindableResource[models.Security, *BoundSecurity]{
 			nextDNSClient: c,
-			bindGeneratingFn: func(s string) string {
-				return "/profiles/" + s + "/security"
-			},
+			pathFmt:       "/profiles/{{ .profileId }}/security",
+			pathArgs:      map[string]interface{}{"profileId": profileId},
 		},
 	}
 	return r.Bind(profileId)
 }
 
 type SecurityTldsService struct {
-	// pathFmt string
 	ListableResource[models.SecurityTlds]
-	// CreatableResource[models.Security]
-	// BindableResource[models.Security, *BoundSecurity]
 }
 
 func (c *NextDNSClient) SecurityTlds() *SecurityTldsService {
@@ -70,16 +65,5 @@ func (c *NextDNSClient) SecurityTlds() *SecurityTldsService {
 			nextDNSClient: c,
 			pathFmt:       "/security/tlds",
 		},
-		// CreatableResource: CreatableResource[models.Security]{
-		// 	nextDNSClient: c,
-		// 	pathFmt:          "/profiles",
-		// },
-		// BindableResource: BindableResource[models.Security, *BoundSecurity]{
-		// 	nextDNSClient: c,
-		// 	pathFmt:          "/profiles",
-		// 	bindGeneratingFn: func(s string) string {
-		// 		return "/profiles/" + s + "/security"
-		// 	},
-		// },
 	}
 }
