@@ -5,28 +5,38 @@ import (
 )
 
 type BoundSetup struct {
-	boundPath     string
+	err           error
+	pathFmt       string
+	pathArgs      map[string]interface{}
 	nextDNSClient *NextDNSClient
 	GetableResource[models.Setup, *BoundSetup]
-	UpdatableResource[models.Setup]
-	DeletableResource[models.Setup]
+	UpdatableResource[models.Setup, *BoundSetup]
 }
 
-func (b *BoundSetup) GetError() error {
-	// Todo Implement this
-	return nil
-}
-
-func (b *BoundSetup) SetBind(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}) T {
+func (b *BoundSetup) InitBoundResource(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}, err error) *BoundSetup {
 	if b == nil {
 		b = &BoundSetup{}
 	}
-	b.GetableResource.nextDNSClient = nextDNSClient
-	b.UpdatableResource.boundPath = bindPath
-	b.UpdatableResource.nextDNSClient = nextDNSClient
-	b.DeletableResource.boundPath = bindPath
-	b.DeletableResource.nextDNSClient = nextDNSClient
+	b.nextDNSClient = nextDNSClient
+	b.pathFmt = pathFmt
+	b.pathArgs = pathArgs
+	b.GetableResource.parent = b
+	b.UpdatableResource.parent = b
 	return b
+}
+
+func (b *BoundSetup) GetNextDNSClient() *NextDNSClient {
+	return b.nextDNSClient
+}
+
+func (b *BoundSetup) GetBoundPath() (string, error) {
+	var path string
+	path, b.err = renderPath(b.pathFmt, b.pathArgs)
+	return path, b.err
+}
+
+func (b *BoundSetup) GetError() error {
+	return b.err
 }
 
 type SetupService struct {
@@ -40,9 +50,8 @@ func (c *NextDNSClient) Setup(profileId string) *BoundSetup {
 	r := &SetupService{
 		BindableResource: BindableResource[models.Setup, *BoundSetup]{
 			nextDNSClient: c,
-			bindGeneratingFn: func(s string) string {
-				return "/profiles/" + s + "/setup"
-			},
+			pathFmt:       "/profiles/{{ .profileId }}/setup",
+			pathArgs:      map[string]interface{}{"profileId": profileId},
 		},
 	}
 	return r.Bind(profileId)
