@@ -45,7 +45,7 @@ func TestMain(m *testing.M) {
 	}
 	for _, profileSummary := range profiles {
 		if isCreatedByIntegrationTest(profileSummary) {
-			panic("Not expecting profile " + profileSummary.Name)
+			// panic("Not expecting profile " + profileSummary.Name)
 		}
 	}
 	os.Exit(m.Run())

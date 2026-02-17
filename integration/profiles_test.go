@@ -69,4 +69,7 @@ func TestProfileErrors(t *testing.T) {
 	// Read test
 	_, err := client.Profiles().Bind("").Get(ctx)
 	require.Error(t, err, "Empty profileId should fail the Get")
+
+	_, err = client.Profiles().Bind("not-an-id").Get(ctx)
+	require.Error(t, err, "Empty profileId should fail the Get")
 }

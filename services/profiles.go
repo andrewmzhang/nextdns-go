@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/andrewmzhang/nextdns-go/models"
 )
 
@@ -10,8 +12,8 @@ type BoundProfile struct {
 	pathArgs      map[string]interface{}
 	nextDNSClient *NextDNSClient
 	GetableResource[models.Profile, *BoundProfile]
-	UpdatableResource[models.Profile]
-	DeletableResource[models.Profile]
+	UpdatableResource[models.Profile, *BoundProfile]
+	DeletableResource[models.Profile, *BoundProfile]
 }
 
 func (b *BoundProfile) GetNextDNSClient() *NextDNSClient {
@@ -20,6 +22,7 @@ func (b *BoundProfile) GetNextDNSClient() *NextDNSClient {
 
 func (b *BoundProfile) GetBoundPath() (string, error) {
 	var path string
+	fmt.Println("pathFmt", b.pathFmt, "pathArgs", b.pathArgs)
 	path, b.err = renderPath(b.pathFmt, b.pathArgs)
 	return path, b.err
 }
@@ -28,16 +31,17 @@ func (b *BoundProfile) GetError() error {
 	return b.err
 }
 
-func (b *BoundProfile) SetBind(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}) *BoundProfile {
+func (b *BoundProfile) SetBind(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}, err error) *BoundProfile {
 	if b == nil {
 		b = &BoundProfile{}
 	}
+	b.nextDNSClient = nextDNSClient
+	b.pathFmt = pathFmt
+	b.pathArgs = pathArgs
+	b.err = err
 	b.GetableResource.parent = b
-	b.GetableResource.nextDNSClient = nextDNSClient
-	b.UpdatableResource.boundPath = pathFmt
-	b.UpdatableResource.nextDNSClient = nextDNSClient
-	b.DeletableResource.boundPath = pathFmt
-	b.DeletableResource.nextDNSClient = nextDNSClient
+	b.UpdatableResource.parent = b
+	b.DeletableResource.parent = b
 	return b
 }
 
@@ -60,9 +64,7 @@ func (c *NextDNSClient) Profiles() *ProfileService {
 		},
 		BindableResource: BindableResource[models.Profile, *BoundProfile]{
 			nextDNSClient: c,
-			bindGeneratingFn: func(s string) string {
-				return "/profiles/" + s
-			},
+			pathFmt:       "/profiles/{{ .id }}",
 		},
 	}
 }

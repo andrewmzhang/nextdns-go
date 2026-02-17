@@ -141,8 +141,9 @@ func (r *CreatableResource[T]) Create(ctx context.Context, payload T) (*T, error
 }
 
 type BindableResource[T any, BoundResource HasBind[BoundResource]] struct {
-	nextDNSClient    *NextDNSClient
-	bindGeneratingFn func(string) string
+	nextDNSClient *NextDNSClient
+	pathFmt       string
+	pathArgs      map[string]interface{}
 }
 
 func (r *BindableResource[T, BoundResource]) Bind(id string) BoundResource {
@@ -151,15 +152,19 @@ func (r *BindableResource[T, BoundResource]) Bind(id string) BoundResource {
 		err = errors.New("id is required")
 	}
 
+	newPathArgs := map[string]interface{}{
+		"id": id,
+	}
+	for k, v := range r.pathArgs {
+		newPathArgs[k] = v
+	}
+
 	var v BoundResource
-	return v.SetBind(r.nextDNSClient, "", nil, err)
+	return v.SetBind(r.nextDNSClient, r.pathFmt, newPathArgs, err)
 }
 
 type GetableResource[T any, Parent BoundResource] struct {
-	parent        Parent
-	nextDNSClient *NextDNSClient
-	pathFmt       string
-	pathArgs      map[string]interface{}
+	parent Parent
 }
 
 func (r *GetableResource[T, Parent]) Get(ctx context.Context) (*T, error) {
@@ -172,7 +177,7 @@ func (r *GetableResource[T, Parent]) Get(ctx context.Context) (*T, error) {
 	}
 	fmt.Println("path:", path)
 	var result DataWrapper[T]
-	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).
+	resp, err := r.parent.GetNextDNSClient().restyClient.R().SetContext(ctx).
 		SetResult(&result).
 		Get(path)
 	if err != nil {
@@ -234,30 +239,38 @@ func (r *ListGetableResource[T]) Get(ctx context.Context) (*T, error) {
 	return nil, errors.New("Could not find resource with id: " + decodedId)
 }
 
-type UpdatableResource[T any] struct {
-	nextDNSClient *NextDNSClient
-	boundPath     string
+type UpdatableResource[T any, Parent BoundResource] struct {
+	parent Parent
 }
 
-func (r *UpdatableResource[T]) Update(ctx context.Context, payload any) error {
+func (r *UpdatableResource[T, Parent]) Update(ctx context.Context, payload any) error {
+	path, err := r.parent.GetBoundPath()
+	if err != nil {
+		return err
+	}
+
 	var result DataWrapper[T]
-	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).
+	resp, err := r.parent.GetNextDNSClient().restyClient.R().SetContext(ctx).
 		SetBody(payload).
-		Patch(r.boundPath)
+		Patch(path)
 
 	err = handleResponse(resp, &result)
 	return err
 }
 
-type DeletableResource[T any] struct {
-	nextDNSClient *NextDNSClient
-	boundPath     string
+type DeletableResource[T any, Parent BoundResource] struct {
+	parent Parent
 }
 
-func (r *DeletableResource[T]) Delete(ctx context.Context) error {
+func (r *DeletableResource[T, Parent]) Delete(ctx context.Context) error {
+	path, err := r.parent.GetBoundPath()
+	if err != nil {
+		return err
+	}
 	var result DataWrapper[T]
-	resp, err := r.nextDNSClient.restyClient.R().SetContext(ctx).
-		Delete(r.boundPath)
+	fmt.Println("path", path)
+	resp, err := r.parent.GetNextDNSClient().restyClient.R().SetContext(ctx).
+		Delete(path)
 	if err != nil {
 		return err
 	}
