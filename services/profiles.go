@@ -5,9 +5,6 @@ import (
 )
 
 type BoundProfile struct {
-	boundPath     string
-	nextDNSClient *NextDNSClient
-	err           error
 	GetableResource[models.Profile]
 	UpdatableResource[models.Profile]
 	DeletableResource[models.Profile]
@@ -15,9 +12,7 @@ type BoundProfile struct {
 
 func (b *BoundProfile) SetBind(nextDNSClient *NextDNSClient, bindPath string, err error) *BoundProfile {
 	if b == nil {
-		b = &BoundProfile{
-			err: err,
-		}
+		b = &BoundProfile{}
 	}
 	b.GetableResource.boundPath = bindPath
 	b.GetableResource.nextDNSClient = nextDNSClient

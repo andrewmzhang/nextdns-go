@@ -63,6 +63,7 @@ func TestProfileLifecycle(t *testing.T) {
 }
 
 func TestProfileErrors(t *testing.T) {
+	// TODO move to unit test
 	ctx := context.Background()
 
 	// Read test
