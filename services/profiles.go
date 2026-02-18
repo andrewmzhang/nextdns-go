@@ -46,7 +46,6 @@ func (b *BoundProfile) InitBoundResource(nextDNSClient *NextDNSClient, pathFmt s
 }
 
 type ProfileService struct {
-	// pathFmt string
 	ListableResource[models.Profile]
 	CreatableResource[models.Profile]
 	BindableResource[models.Profile, *BoundProfile]

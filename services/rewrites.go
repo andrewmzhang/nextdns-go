@@ -44,7 +44,6 @@ func (b *BoundRewrite) InitBoundResource(nextDNSClient *NextDNSClient, pathFmt s
 }
 
 type RewriteService struct {
-	// pathFmt string
 	ListableResource[models.Rewrite]
 	CreatableResource[models.Rewrite]
 	BindableResource[models.Rewrite, *BoundRewrite]

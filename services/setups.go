@@ -40,9 +40,6 @@ func (b *BoundSetup) GetError() error {
 }
 
 type SetupService struct {
-	// pathFmt string
-	// ListableResource[models.Setup]
-	// CreatableResource[models.Setup]
 	BindableResource[models.Setup, *BoundSetup]
 }
 

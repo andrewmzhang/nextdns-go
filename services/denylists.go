@@ -44,7 +44,6 @@ func (b *BoundDenylist) GetBoundPath() (string, error) {
 }
 
 type DenylistService struct {
-	// pathFmt string
 	ListableResource[models.Denylist]
 	CreatableResource[models.Denylist]
 	BindableResource[models.Denylist, *BoundDenylist]

@@ -69,7 +69,6 @@ func (c *NextDNSClient) PrivacyBlocklists() *PrivacyBlocklistsService {
 }
 
 type PrivacyNativesService struct {
-	// pathFmt string
 	ListableResource[models.PrivacyNatives]
 }
 

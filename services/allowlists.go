@@ -44,7 +44,6 @@ func (b *BoundAllowlist) GetBoundPath() (string, error) {
 }
 
 type AllowlistService struct {
-	// pathFmt string
 	ListableResource[models.Allowlist]
 	CreatableResource[models.Allowlist]
 	BindableResource[models.Allowlist, *BoundAllowlist]
