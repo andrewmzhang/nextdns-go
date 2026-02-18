@@ -39,10 +39,50 @@ func TestDenylistLifecycle(t *testing.T) {
 	denyItem, err := client.Denylists(create.ID).Bind("example3.com").Get(ctx)
 	require.NoError(t, err)
 	require.True(t, denyItem.Active)
+	fmt.Println("denyItem:", denyItem)
 	// fmt.Println(denyItem.Update(ctx, models.Denylist{
 	// 	Active: true,
 	// }))
 	// denylist, err = client.Denylist(create.ID).List(ctx)
 	// require.NoError(t, err)
 	// require.True(t, denylist[0].Active)
+}
+
+func TestDenylistErrors(t *testing.T) {
+	// TODO move to unit tests
+	ctx := context.Background()
+
+	clientService := client.Denylists
+
+	for _, badProfileId := range []string{"", "not-a-profile-id"} {
+		// Read test
+		denylist, err := clientService(badProfileId).List(ctx)
+		require.Error(t, err)
+		require.Empty(t, denylist)
+
+		// Create
+		denylistitem, err := clientService(badProfileId).Create(ctx, models.Denylist{})
+		require.Error(t, err)
+		require.Nil(t, denylistitem)
+
+		for _, badDenyId := range []string{"", "not-a-denylist-id"} {
+			// Bind
+			boundDenyItem := clientService(badProfileId).Bind(badDenyId)
+
+			// List-get test
+			denylistitem, err = boundDenyItem.Get(ctx)
+			require.Error(t, err)
+			require.Nil(t, denylistitem)
+
+			// update test
+			err = boundDenyItem.Update(ctx, nil)
+			require.Error(t, err)
+			require.Nil(t, denylistitem)
+
+			// Delete
+			err = boundDenyItem.Delete(ctx)
+			require.Error(t, err)
+
+		}
+	}
 }
