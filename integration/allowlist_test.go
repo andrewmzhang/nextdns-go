@@ -46,3 +46,42 @@ func TestAllowlistLifecycle(t *testing.T) {
 	// require.NoError(t, err)
 	// require.True(t, allowlist[0].Active)
 }
+
+func TestAllowlistErrors(t *testing.T) {
+	// TODO move to unit tests
+	ctx := context.Background()
+
+	clientService := client.Allowlists
+
+	for _, badProfileId := range []string{"", "not-a-profile-id"} {
+		// Read test
+		allowlist, err := clientService(badProfileId).List(ctx)
+		require.Error(t, err)
+		require.Empty(t, allowlist)
+
+		// Create
+		allowlistitem, err := clientService(badProfileId).Create(ctx, models.Allowlist{})
+		require.Error(t, err)
+		require.Nil(t, allowlistitem)
+
+		for _, badRewriteId := range []string{"", "not-a-allowlist-id"} {
+			// Bind
+			boundRewrite := clientService(badProfileId).Bind(badRewriteId)
+
+			// List-get test
+			allowlistitem, err = boundRewrite.Get(ctx)
+			require.Error(t, err)
+			require.Nil(t, allowlistitem)
+
+			// update test
+			err = boundRewrite.Update(ctx, nil)
+			require.Error(t, err)
+			require.Nil(t, allowlistitem)
+
+			// Delete
+			err = boundRewrite.Delete(ctx)
+			require.Error(t, err)
+
+		}
+	}
+}

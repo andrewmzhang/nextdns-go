@@ -207,7 +207,9 @@ func (r *ListGetableResource[T, Parent]) Get(ctx context.Context) (*T, error) {
 	results := &struct {
 		Data []T `json:"data"`
 	}{}
+	fmt.Println("path:", path)
 	parent := filepath.Dir(path)
+	fmt.Println("parent:", parent)
 	resp, err := r.parent.GetNextDNSClient().restyClient.R().SetContext(ctx).
 		SetResult(&results).
 		Get(parent)
