@@ -4,7 +4,6 @@ package integration
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/andrewmzhang/nextdns-go/models"
@@ -24,16 +23,16 @@ func TestAllowlistLifecycle(t *testing.T) {
 	require.NoError(t, err)
 
 	allowlist, err := client.Allowlists(create.ID).List(ctx)
-	fmt.Println(allowlist)
+
 	require.NoError(t, err)
 	require.NotNil(t, allowlist)
 	require.Equal(t, len(allowlist), 0)
 
-	allowcreate, err := client.Allowlists(create.ID).Create(ctx, models.Allowlist{
+	_, err = client.Allowlists(create.ID).Create(ctx, models.Allowlist{
 		ID:     "example3.com",
 		Active: true,
 	})
-	fmt.Println(allowcreate)
+
 	require.NoError(t, err)
 	// Get will not work with allowlist
 	allowItem, err := client.Allowlists(create.ID).Bind("example3.com").Get(ctx)

@@ -78,5 +78,4 @@ func main() {
 	}
 	fmt.Fprintln(f, ")")
 
-	fmt.Println("Generated", filename)
 }

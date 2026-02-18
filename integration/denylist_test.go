@@ -4,7 +4,6 @@ package integration
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/andrewmzhang/nextdns-go/models"
@@ -24,22 +23,22 @@ func TestDenylistLifecycle(t *testing.T) {
 	require.NoError(t, err)
 
 	denylist, err := client.Denylists(create.ID).List(ctx)
-	fmt.Println(denylist)
+
 	require.NoError(t, err)
 	require.NotNil(t, denylist)
 	require.Equal(t, len(denylist), 0)
 
-	denycreate, err := client.Denylists(create.ID).Create(ctx, models.Denylist{
+	_, err = client.Denylists(create.ID).Create(ctx, models.Denylist{
 		ID:     "example3.com",
 		Active: true,
 	})
-	fmt.Println(denycreate)
+
 	require.NoError(t, err)
 	// Get will not work with denylist
 	denyItem, err := client.Denylists(create.ID).Bind("example3.com").Get(ctx)
 	require.NoError(t, err)
 	require.True(t, denyItem.Active)
-	fmt.Println("denyItem:", denyItem)
+
 	// fmt.Println(denyItem.Update(ctx, models.Denylist{
 	// 	Active: true,
 	// }))

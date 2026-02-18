@@ -4,7 +4,6 @@ package integration
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/andrewmzhang/nextdns-go/models"
@@ -27,7 +26,7 @@ func TestPrivacyLifecycle(t *testing.T) {
 	// Check getting privacy
 	privacy, err := client.Privacy(create.ID).Get(ctx)
 	require.NoError(t, err)
-	fmt.Println("privacy", privacy)
+
 	require.Empty(t, privacy.Blocklists)
 	require.Empty(t, privacy.Natives)
 	require.False(t, *privacy.DisguisedTrackers)

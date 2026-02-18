@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/andrewmzhang/nextdns-go/models"
 )
 
@@ -22,7 +20,7 @@ func (b *BoundProfile) GetNextDNSClient() *NextDNSClient {
 
 func (b *BoundProfile) GetBoundPath() (string, error) {
 	var path string
-	fmt.Println("pathFmt", b.pathFmt, "pathArgs", b.pathArgs)
+
 	path, b.err = renderPath(b.pathFmt, b.pathArgs)
 	return path, b.err
 }

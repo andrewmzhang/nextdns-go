@@ -178,7 +178,7 @@ func (r *GetableResource[T, Parent]) Get(ctx context.Context) (*T, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("path:", path)
+
 	var result DataWrapper[T]
 	resp, err := r.parent.GetNextDNSClient().restyClient.R().SetContext(ctx).
 		SetResult(&result).
@@ -207,9 +207,9 @@ func (r *ListGetableResource[T, Parent]) Get(ctx context.Context) (*T, error) {
 	results := &struct {
 		Data []T `json:"data"`
 	}{}
-	fmt.Println("path:", path)
+
 	parent := filepath.Dir(path)
-	fmt.Println("parent:", parent)
+
 	resp, err := r.parent.GetNextDNSClient().restyClient.R().SetContext(ctx).
 		SetResult(&results).
 		Get(parent)
@@ -259,7 +259,7 @@ func (r *UpdatableResource[T, Parent]) Update(ctx context.Context, payload any) 
 		return r.parent.GetError()
 	}
 	path, err := r.parent.GetBoundPath()
-	fmt.Println("UpdatePath:", path)
+
 	if err != nil {
 		return err
 	}
@@ -286,7 +286,7 @@ func (r *DeletableResource[T, Parent]) Delete(ctx context.Context) error {
 		return err
 	}
 	var result DataWrapper[T]
-	fmt.Println("path", path)
+
 	resp, err := r.parent.GetNextDNSClient().restyClient.R().SetContext(ctx).
 		Delete(path)
 	if err != nil {
