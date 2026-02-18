@@ -4,7 +4,6 @@ package integration
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/andrewmzhang/nextdns-go/models"
@@ -24,16 +23,16 @@ func TestAllowlistLifecycle(t *testing.T) {
 	require.NoError(t, err)
 
 	allowlist, err := client.Allowlists(create.ID).List(ctx)
-	fmt.Println(allowlist)
+
 	require.NoError(t, err)
 	require.NotNil(t, allowlist)
 	require.Equal(t, len(allowlist), 0)
 
-	allowcreate, err := client.Allowlists(create.ID).Create(ctx, models.Allowlist{
+	_, err = client.Allowlists(create.ID).Create(ctx, models.Allowlist{
 		ID:     "example3.com",
 		Active: true,
 	})
-	fmt.Println(allowcreate)
+
 	require.NoError(t, err)
 	// Get will not work with allowlist
 	allowItem, err := client.Allowlists(create.ID).Bind("example3.com").Get(ctx)
@@ -45,4 +44,43 @@ func TestAllowlistLifecycle(t *testing.T) {
 	// allowlist, err = client.Allowlist(create.ID).List(ctx)
 	// require.NoError(t, err)
 	// require.True(t, allowlist[0].Active)
+}
+
+func TestAllowlistErrors(t *testing.T) {
+	// TODO move to unit tests
+	ctx := context.Background()
+
+	clientService := client.Allowlists
+
+	for _, badProfileId := range []string{"", "not-a-profile-id"} {
+		// Read test
+		allowlist, err := clientService(badProfileId).List(ctx)
+		require.Error(t, err)
+		require.Empty(t, allowlist)
+
+		// Create
+		allowlistitem, err := clientService(badProfileId).Create(ctx, models.Allowlist{})
+		require.Error(t, err)
+		require.Nil(t, allowlistitem)
+
+		for _, badRewriteId := range []string{"", "not-a-allowlist-id"} {
+			// Bind
+			boundRewrite := clientService(badProfileId).Bind(badRewriteId)
+
+			// List-get test
+			allowlistitem, err = boundRewrite.Get(ctx)
+			require.Error(t, err)
+			require.Nil(t, allowlistitem)
+
+			// update test
+			err = boundRewrite.Update(ctx, nil)
+			require.Error(t, err)
+			require.Nil(t, allowlistitem)
+
+			// Delete
+			err = boundRewrite.Delete(ctx)
+			require.Error(t, err)
+
+		}
+	}
 }

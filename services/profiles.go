@@ -5,28 +5,45 @@ import (
 )
 
 type BoundProfile struct {
-	boundPath     string
+	err           error
+	pathFmt       string
+	pathArgs      map[string]interface{}
 	nextDNSClient *NextDNSClient
-	GetableResource[models.Profile]
-	UpdatableResource[models.Profile]
-	DeletableResource[models.Profile]
+	GetableResource[models.Profile, *BoundProfile]
+	UpdatableResource[models.Profile, *BoundProfile]
+	DeletableResource[models.Profile, *BoundProfile]
 }
 
-func (b *BoundProfile) SetBind(nextDNSClient *NextDNSClient, bindPath string) *BoundProfile {
+func (b *BoundProfile) GetNextDNSClient() *NextDNSClient {
+	return b.nextDNSClient
+}
+
+func (b *BoundProfile) GetBoundPath() (string, error) {
+	var path string
+
+	path, b.err = renderPath(b.pathFmt, b.pathArgs)
+	return path, b.err
+}
+
+func (b *BoundProfile) GetError() error {
+	return b.err
+}
+
+func (b *BoundProfile) InitBoundResource(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}, err error) *BoundProfile {
 	if b == nil {
 		b = &BoundProfile{}
 	}
-	b.GetableResource.boundPath = bindPath
-	b.GetableResource.nextDNSClient = nextDNSClient
-	b.UpdatableResource.boundPath = bindPath
-	b.UpdatableResource.nextDNSClient = nextDNSClient
-	b.DeletableResource.boundPath = bindPath
-	b.DeletableResource.nextDNSClient = nextDNSClient
+	b.nextDNSClient = nextDNSClient
+	b.pathFmt = pathFmt
+	b.pathArgs = pathArgs
+	b.err = err
+	b.GetableResource.parent = b
+	b.UpdatableResource.parent = b
+	b.DeletableResource.parent = b
 	return b
 }
 
 type ProfileService struct {
-	// path string
 	ListableResource[models.Profile]
 	CreatableResource[models.Profile]
 	BindableResource[models.Profile, *BoundProfile]
@@ -36,17 +53,15 @@ func (c *NextDNSClient) Profiles() *ProfileService {
 	return &ProfileService{
 		ListableResource: ListableResource[models.Profile]{
 			nextDNSClient: c,
-			path:          "/profiles",
+			pathFmt:       "/profiles",
 		},
 		CreatableResource: CreatableResource[models.Profile]{
 			nextDNSClient: c,
-			path:          "/profiles",
+			pathFmt:       "/profiles",
 		},
 		BindableResource: BindableResource[models.Profile, *BoundProfile]{
 			nextDNSClient: c,
-			bindGeneratingFn: func(s string) string {
-				return "/profiles/" + s
-			},
+			pathFmt:       "/profiles/{{ .id }}",
 		},
 	}
 }

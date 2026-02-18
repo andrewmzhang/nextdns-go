@@ -2,7 +2,6 @@ package integration
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/andrewmzhang/nextdns-go/models"
@@ -28,8 +27,7 @@ func TestAnalyticStatus(t *testing.T) {
 
 	config := services.AnalyticsDevicesQueryConfig{}
 	config.From = "-3M"
-	analyticStatuses, err := client.AnalyticDevices(create.ID).ListAll(ctx, config, false)
+	_, err = client.AnalyticDevices(create.ID).ListAll(ctx, config, false)
 	require.NoError(t, err)
-	fmt.Println(analyticStatuses)
 
 }

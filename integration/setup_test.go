@@ -30,3 +30,22 @@ func TestSetupLifecycle(t *testing.T) {
 	require.Equal(t, len(setup.Ipv6), 2, "As of time of writing, there are always 2 ipv6 addresses")
 	require.Equal(t, len(setup.Ipv4), 0, "As of time of writing, there are always 0 ipv4 address")
 }
+
+func TestSetupErrors(t *testing.T) {
+	// TODO move to unit tests
+	ctx := context.Background()
+
+	clientService := client.Setup
+
+	for _, badProfileId := range []string{"", "not-a-profile-id"} {
+		// Read test
+		security, err := clientService(badProfileId).Get(ctx)
+		require.Error(t, err)
+		require.Empty(t, security)
+
+		// Update test
+		err = clientService(badProfileId).Update(ctx, security)
+		require.Error(t, err)
+		require.Empty(t, security)
+	}
+}

@@ -61,3 +61,15 @@ func TestProfileLifecycle(t *testing.T) {
 	require.NotEmpty(t, profile.Name)
 	require.NoError(t, err)
 }
+
+func TestProfileErrors(t *testing.T) {
+	// TODO move to unit test
+	ctx := context.Background()
+
+	// Read test
+	_, err := client.Profiles().Bind("").Get(ctx)
+	require.Error(t, err, "Empty profileId should fail the Get")
+
+	_, err = client.Profiles().Bind("not-an-id").Get(ctx)
+	require.Error(t, err, "Empty profileId should fail the Get")
+}

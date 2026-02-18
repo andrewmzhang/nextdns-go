@@ -65,7 +65,7 @@ func fetchPage[T any, Config any](
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(resp)
+
 	err = handleResponse(resp, &results.Data)
 	return &results, err
 }
@@ -117,18 +117,17 @@ func (it *AnalyticIterator[Service, Config, T]) Next() bool {
 	resp, err := fetchPage[T, Config](it.ctx, it.nextDNSClient.restyClient, it.path, it.isTimeSeries, it.config, it.cursor)
 	if err != nil {
 		it.err = err
-		fmt.Println("Error fetching next DNS page")
+
 		return false
 	}
 
 	// No more data
 	if len(resp.Data) == 0 {
 		it.done = true
-		fmt.Println("No more data to read")
+
 		return false
 	}
 
-	fmt.Println(len(resp.Data))
 	it.buffer = resp.Data
 	it.cursor = resp.Meta.Pagination.Cursor
 	it.index = 1

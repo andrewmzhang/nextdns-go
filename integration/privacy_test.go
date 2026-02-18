@@ -26,6 +26,7 @@ func TestPrivacyLifecycle(t *testing.T) {
 	// Check getting privacy
 	privacy, err := client.Privacy(create.ID).Get(ctx)
 	require.NoError(t, err)
+
 	require.Empty(t, privacy.Blocklists)
 	require.Empty(t, privacy.Natives)
 	require.False(t, *privacy.DisguisedTrackers)
@@ -72,4 +73,22 @@ func TestPrivacyLifecycle(t *testing.T) {
 	privacyNativesList, err := client.PrivacyNatives().List(ctx)
 	require.NoError(t, err)
 	require.Equal(t, len(privacyNativesList), 8)
+}
+func TestPrivacyErrors(t *testing.T) {
+	// TODO move to unit tests
+	ctx := context.Background()
+
+	clientService := client.Privacy
+
+	for _, badProfileId := range []string{"", "not-a-profile-id"} {
+		// Read test
+		security, err := clientService(badProfileId).Get(ctx)
+		require.Error(t, err)
+		require.Empty(t, security)
+
+		// Update test
+		err = clientService(badProfileId).Update(ctx, security)
+		require.Error(t, err)
+		require.Empty(t, security)
+	}
 }

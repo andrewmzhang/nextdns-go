@@ -5,31 +5,43 @@ import (
 )
 
 type BoundRewrite struct {
-	boundPath     string
+	err           error
+	pathFmt       string
+	pathArgs      map[string]interface{}
 	nextDNSClient *NextDNSClient
-	// GetableResource[models.Rewrite]
-	// UpdatableResource[models.Rewrite]
-	ListGetableResource[models.Rewrite]
-	DeletableResource[models.Rewrite]
+	ListGetableResource[models.Rewrite, *BoundRewrite]
+	DeletableResource[models.Rewrite, *BoundRewrite]
 }
 
-func (b *BoundRewrite) SetBind(nextDNSClient *NextDNSClient, bindPath string) *BoundRewrite {
+func (b *BoundRewrite) GetError() error {
+	return b.err
+}
+
+func (b *BoundRewrite) GetNextDNSClient() *NextDNSClient {
+	return b.nextDNSClient
+}
+
+func (b *BoundRewrite) GetBoundPath() (string, error) {
+	var path string
+
+	path, b.err = renderPath(b.pathFmt, b.pathArgs)
+	return path, b.err
+}
+
+func (b *BoundRewrite) InitBoundResource(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}, err error) *BoundRewrite {
 	if b == nil {
 		b = &BoundRewrite{}
 	}
-	// b.GetableResource.boundPath = bindPath
-	// b.GetableResource.nextDNSClient = nextDNSClient
-	// b.UpdatableResource.boundPath = bindPath
-	// b.UpdatableResource.nextDNSClient = nextDNSClient
-	b.ListGetableResource.nextDNSClient = nextDNSClient
-	b.ListGetableResource.boundPath = bindPath
-	b.DeletableResource.boundPath = bindPath
-	b.DeletableResource.nextDNSClient = nextDNSClient
+	b.nextDNSClient = nextDNSClient
+	b.pathFmt = pathFmt
+	b.pathArgs = pathArgs
+	b.err = err
+	b.ListGetableResource.parent = b
+	b.DeletableResource.parent = b
 	return b
 }
 
 type RewriteService struct {
-	// path string
 	ListableResource[models.Rewrite]
 	CreatableResource[models.Rewrite]
 	BindableResource[models.Rewrite, *BoundRewrite]
@@ -39,16 +51,23 @@ func (c *NextDNSClient) Rewrites(profileId string) *RewriteService {
 	r := &RewriteService{
 		ListableResource: ListableResource[models.Rewrite]{
 			nextDNSClient: c,
-			path:          "/profiles/" + profileId + "/rewrites",
+			pathFmt:       "/profiles/{{ .profileId }}/rewrites",
+			pathArgs: map[string]interface{}{
+				"profileId": profileId,
+			},
 		},
 		CreatableResource: CreatableResource[models.Rewrite]{
 			nextDNSClient: c,
-			path:          "/profiles/" + profileId + "/rewrites",
+			pathFmt:       "/profiles/{{ .profileId }}/rewrites",
+			pathArgs: map[string]interface{}{
+				"profileId": profileId,
+			},
 		},
 		BindableResource: BindableResource[models.Rewrite, *BoundRewrite]{
 			nextDNSClient: c,
-			bindGeneratingFn: func(s string) string {
-				return "/profiles/" + profileId + "/rewrites/" + s
+			pathFmt:       "/profiles/{{ .profileId }}/rewrites/{{ .id }}",
+			pathArgs: map[string]interface{}{
+				"profileId": profileId,
 			},
 		},
 	}

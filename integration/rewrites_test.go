@@ -46,3 +46,40 @@ func TestRewriteLifecycle(t *testing.T) {
 	require.NoError(t, err)
 
 }
+
+func TestRewriteErrors(t *testing.T) {
+	// TODO move to unit tests
+	ctx := context.Background()
+
+	clientService := client.Rewrites
+
+	for _, badProfileId := range []string{"", "not-a-profile-id"} {
+		// Read test
+		rewrites, err := clientService(badProfileId).List(ctx)
+		require.Error(t, err)
+		require.Empty(t, rewrites)
+
+		// Create
+		rewrite, err := clientService(badProfileId).Create(ctx, models.Rewrite{
+			Name:    "a.example.com",
+			Content: "b.example.com",
+		})
+		require.Error(t, err)
+		require.Nil(t, rewrite)
+
+		for _, badRewriteId := range []string{"", "not-a-rewrite-id"} {
+			// Bind
+			boundRewrite := clientService(badProfileId).Bind(badRewriteId)
+
+			// List-get test
+			rewrite, err = boundRewrite.Get(ctx)
+			require.Error(t, err)
+			require.Nil(t, rewrite)
+
+			// Delete
+			err = boundRewrite.Delete(ctx)
+			require.Error(t, err)
+
+		}
+	}
+}

@@ -14,7 +14,7 @@ type Data struct {
 
 func main() {
 	if len(os.Args) != 2 {
-		fmt.Println("usage: go run main.go value1,value2,value3")
+
 		os.Exit(1)
 	}
 
@@ -89,5 +89,4 @@ func (p {{.Type}}) String() string {
 		}
 	}
 
-	fmt.Println("Generated", outputFilename)
 }
