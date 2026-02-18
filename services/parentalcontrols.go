@@ -5,62 +5,58 @@ import (
 )
 
 type BoundParentalControl struct {
-	boundPath     string
-	nextDNSClient *NextDNSClient
 	err           error
+	pathFmt       string
+	pathArgs      map[string]interface{}
+	nextDNSClient *NextDNSClient
 	GetableResource[models.ParentalControl, *BoundParentalControl]
-	UpdatableResource[models.ParentalControl]
-	// DeletableResource[models.ParentalControl]
+	UpdatableResource[models.ParentalControl, *BoundParentalControl]
+}
+
+func (b *BoundParentalControl) InitBoundResource(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}, err error) *BoundParentalControl {
+	if b == nil {
+		b = &BoundParentalControl{}
+	}
+	b.nextDNSClient = nextDNSClient
+	b.pathFmt = pathFmt
+	b.pathArgs = pathArgs
+	b.err = err
+	b.GetableResource.parent = b
+	b.UpdatableResource.parent = b
+	return b
+}
+
+func (b *BoundParentalControl) GetNextDNSClient() *NextDNSClient {
+	return b.nextDNSClient
+}
+
+func (b *BoundParentalControl) GetBoundPath() (string, error) {
+	var path string
+	path, b.err = renderPath(b.pathFmt, b.pathArgs)
+	return path, b.err
 }
 
 func (b *BoundParentalControl) GetError() error {
 	return b.err
 }
 
-func (b *BoundParentalControl) SetBind(nextDNSClient *NextDNSClient, pathFmt string, pathArgs map[string]interface{}) T {
-	if b == nil {
-		b = &BoundParentalControl{}
-	}
-	b.GetableResource.nextDNSClient = nextDNSClient
-	b.UpdatableResource.boundPath = bindPath
-	b.UpdatableResource.nextDNSClient = nextDNSClient
-	// b.DeletableResource.boundPath = bindPath
-	// b.DeletableResource.nextDNSClient = nextDNSClient
-	return b
-}
-
 type ParentalControlService struct {
-	// pathFmt string
-	// ListableResource[models.ParentalControl]
-	// CreatableResource[models.ParentalControl]
 	BindableResource[models.ParentalControl, *BoundParentalControl]
 }
 
 func (c *NextDNSClient) ParentalControl(profileId string) *BoundParentalControl {
 	r := &ParentalControlService{
-		// ListableResource: ListableResource[models.ParentalControl]{
-		// 	nextDNSClient: c,
-		// 	pathFmt:          "/profiles",
-		// },
-		// CreatableResource: CreatableResource[models.ParentalControl]{
-		// 	nextDNSClient: c,
-		// 	pathFmt:          "/profiles",
-		// },
 		BindableResource: BindableResource[models.ParentalControl, *BoundParentalControl]{
 			nextDNSClient: c,
-			bindGeneratingFn: func(s string) string {
-				return "/profiles/" + s + "/parentalcontrol"
-			},
+			pathFmt:       "/profiles/{{ .profileId }}/parentalcontrol",
+			pathArgs:      map[string]interface{}{"profileId": profileId},
 		},
 	}
 	return r.Bind(profileId)
 }
 
 type ParentalControlServicesService struct {
-	// pathFmt string
 	ListableResource[models.ParentalControlServices]
-	// CreatableResource[models.ParentalControl]
-	// BindableResource[models.ParentalControl, *BoundParentalControl]
 }
 
 func (c *NextDNSClient) ParentalControlServices() *ParentalControlServicesService {
@@ -69,25 +65,11 @@ func (c *NextDNSClient) ParentalControlServices() *ParentalControlServicesServic
 			nextDNSClient: c,
 			pathFmt:       "/parentalcontrol/services",
 		},
-		// CreatableResource: CreatableResource[models.ParentalControl]{
-		// 	nextDNSClient: c,
-		// 	pathFmt:          "/profiles",
-		// },
-		// BindableResource: BindableResource[models.ParentalControl, *BoundParentalControl]{
-		// 	nextDNSClient: c,
-		// 	pathFmt:          "/profiles",
-		// 	bindGeneratingFn: func(s string) string {
-		// 		return "/profiles/" + s + "/parentalcontrol"
-		// 	},
-		// },
 	}
 }
 
 type ParentalControlCategoriesService struct {
-	// pathFmt string
 	ListableResource[models.ParentalControlCategories]
-	// CreatableResource[models.ParentalControl]
-	// BindableResource[models.ParentalControl, *BoundParentalControl]
 }
 
 func (c *NextDNSClient) ParentalControlCategories() *ParentalControlCategoriesService {
@@ -96,16 +78,5 @@ func (c *NextDNSClient) ParentalControlCategories() *ParentalControlCategoriesSe
 			nextDNSClient: c,
 			pathFmt:       "/parentalcontrol/categories",
 		},
-		// CreatableResource: CreatableResource[models.ParentalControl]{
-		// 	nextDNSClient: c,
-		// 	pathFmt:          "/profiles",
-		// },
-		// BindableResource: BindableResource[models.ParentalControl, *BoundParentalControl]{
-		// 	nextDNSClient: c,
-		// 	pathFmt:          "/profiles",
-		// 	bindGeneratingFn: func(s string) string {
-		// 		return "/profiles/" + s + "/parentalcontrol"
-		// 	},
-		// },
 	}
 }
